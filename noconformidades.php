@@ -81,7 +81,7 @@ include ("../conexion_servidor.php");
 Retornar los datos de una NoConformidad para consulta
 *******************************************************************************************************************************************/
 if($_GET['TipoModificar']==md5('AjaxMostrarNoConformidad'.date('d')) and $_GET['NumeroNC']){
-	$Queri = "SELECT NC.NumeroNC, NC.Tipo, NC.CodGestion, Ges.NomGestion, NC.Proceso, NC.FApertura, NC.DetectadaEn, NC.Descripcion, NC.Correccion, NC.Observacion,
+	$Queri = "SELECT NC.NumeroNC, NC.Tipo, NC.CodGestion, Ges.NomGestion, NC.Proceso, NC.FApertura, NC.DetectadaEn, NC.Descripcion, NC.Correccion,
 					CONCAT(E.Nom,' ',E.Apellido1) AS NomResponsable, NC.Causas,NC.RequiereAC,NumeroNCAccionCorrectiva,
 					NC.Accion, NC.ResultadoRevision, NC.FRevision, NC.MotivoCierre, NC.NuevaAccion, NC.FCierre, NC.RCierre
 				FROM calidad.noconformidades NC
@@ -120,9 +120,6 @@ if($_GET['TipoModificar']==md5('AjaxMostrarNoConformidad'.date('d')) and $_GET['
         <div class="clearfix"></div>
         <div class="col-sm-12 panel panel-default">
         <label class="label-xsmall">Relación de actividades:</label> <?php echo $Row['Correccion'];?>
-        </div>
-        <div class="col-sm-12 panel panel-default">
-        <label class="label-xsmall">Observación:</label> <?php echo $Row['Observacion'];?>
         </div><?php
         if($Row['Tipo']=='Corrección'){?>
         <div class="clearfix"></div>
@@ -228,7 +225,7 @@ Retornar los datos de una NoConformidad para edición
         $respuesta = array(
             'status' => 'OK',
             'CodGestion' => $Row['CodGestion'],
-            'proceso' => $Row['Proceso'],
+            'Proceso' => $Row['Proceso'],
             'NomResponsable' => $Row['NomResponsable'],
             'Tipo' => $Row['Tipo'],
             'FApertura' => DarFecha($Row['FApertura']),
@@ -236,7 +233,6 @@ Retornar los datos de una NoConformidad para edición
             'DetectadaEnOtra' => ($Row['DetectadaEn'] <> 'Quejas' ? $Row['DetectadaEn'] : $Row['IDQueja']),
             'Descripcion' => $Row['Descripcion'],
             'Correccion' => $Row['Correccion'],
-            'Observacion' => $Row['Observacion'],
             'RequiereAC' => $Row['RequiereAC'],
             'NumeroNCAccionCorrectiva' => $Row['NumeroNCAccionCorrectiva'],
             'Causas' => $Row['Causas'],
@@ -262,14 +258,8 @@ GRABAR los datos de una NoConformidad
         $_POST['DetectadaEn'] = addslashes($_POST['DetectadaEnOtra']);
     }
     
-    // TEMPORAL: Pegar la Observacion al final de la Descripcion
-    if(!empty($_POST['Observacion'])){
-        $_POST['Descripcion'] = $_POST['Descripcion'] . "\n\n[Observación temporal: " . $_POST['Observacion'] . "]";
-    }
-    
     if($_POST['NumeroNC']=='Nuevo'){
         $EsNueva=1;
-        // INSERT (Ya no pide la columna Observacion)
         $QueriGrabar = "INSERT INTO calidad.noconformidades (Responsable, Tipo, CodGestion, Proceso, FApertura,DetectadaEn,Descripcion,
                                     Correccion,RequiereAC,NumeroNCAccionCorrectiva,Causas,Accion,FRevision,IPApertura,FHApertura)
                             VALUES
@@ -279,7 +269,6 @@ GRABAR los datos de una NoConformidad
         $ResultGrabar = $mysqli->query($QueriGrabar) or die(json_encode(["status" => "error", "message" => mysqli_error($mysqli)]));
         $_POST['NumeroNC']=$mysqli->insert_id;
     }else{
-        // UPDATE (Ya no pide la columna Observacion)
         $QueriGrabar = "UPDATE calidad.noconformidades SET CodGestion = '".$_POST['CodGestion']."',
                             Tipo = '".$_POST['Tipo']."',
                             Proceso = '".$_POST['Proceso']."',
@@ -337,7 +326,6 @@ GRABAR los datos de una NoConformidad
             $Servicio='Office';
             $Subject = "MANEJO NO CONFORMIDADES";
             
-            // Eliminamos la variable Observación de este correo, ya que ahora viajará dentro de la variable Descripcion
             $Mensaje="Se ha generado un nuevo registro <b>NO CONFORMIDAD</b> que corresponde a los siguientes datos:<br><br>
                     Responsable Apertura <b>".$Row['NomResponsable']."</b><br>
                     Gestión <b>".$Row['CodGestion']."</b><br>
@@ -491,24 +479,35 @@ GRABAR los datos de Cierre de una NoConformidad
 CambioGestionProceso
 *******************************************************************************************************************************************/
 }elseif($_GET['TipoModificar']==md5('JorCambioGestionProceso'.date('d')) and $_GET['CodGestion']){
-	echo 'mProceso='.($_GET['Proceso'] ? "'".$_GET['Proceso']."'" : 'document.getElementById("Proceso").value').';document.getElementById("Proceso").length=1;';
-	//Obtengo el listado de los procesos
+
+	$CodGestion = $mysqli->real_escape_string($_GET['CodGestion']);
+	$Usuario    = $mysqli->real_escape_string($_SESSION["Usuario"]);
+
+	// Obtengo el listado de los procesos (la regla de permisos queda igual)
 	if($PuedeAdministrar or $PuedeGeneral){
 		$QueriProc = "SELECT Colegio, CodProceso, NomProceso
 						FROM calidad.procesos
-						WHERE CodGestion='".$_GET['CodGestion']."'
+						WHERE CodGestion='".$CodGestion."'
 						ORDER BY NomProceso";
 	}else{
 		$QueriProc = "SELECT Colegio, CodProceso, NomProceso
 						FROM calidad.procesos
-						WHERE CodGestion='".$_GET['CodGestion']."' AND FIND_IN_SET('".$_SESSION["Usuario"]."',DueProceso)
+						WHERE CodGestion='".$CodGestion."' AND FIND_IN_SET('".$Usuario."',DueProceso)
 						ORDER BY NomProceso";
 	}
-	$ResultProc = $mysqli->query($QueriProc) or die(mysqli_error($mysqli));
-	while($RowProc=$ResultProc->fetch_assoc()){
-		echo 'document.getElementById("Proceso").add(new Option("'.$RowProc['NomProceso'].'", "'.$RowProc['Colegio'].$RowProc['CodProceso'].'", null));';
+
+	$ResultProc = $mysqli->query($QueriProc)
+		or die(json_encode(["status"=>"error","message"=>mysqli_error($mysqli)]));
+
+	$procesos = [];
+	while($RowProc = $ResultProc->fetch_assoc()){
+		$procesos[] = [
+			"codigo" => $RowProc['Colegio'].$RowProc['CodProceso'],
+			"nombre" => $RowProc['NomProceso']
+		];
 	}
-	echo 'if(mProceso){document.getElementById("Proceso").value=mProceso;}';
+
+	echo json_encode(["status"=>"success","procesos"=>$procesos], JSON_UNESCAPED_UNICODE);
 	mysqli_close($mysqli);
 	exit;
 /******************************************************************************************************************************************
@@ -707,7 +706,8 @@ body {
     color: #6c757d;
 }
 
-.select2-container { 
+/* Solo afecta a los modales */
+#ModalEditarNoConformidad .select2-container { 
     width: 100% !important; 
 }
 
@@ -861,6 +861,7 @@ function MostrarDivEditarNoConformidad(mNumeroNC){
         // Limpiamos ocultando campos dependientes por seguridad al crear uno nuevo
 		$('#DivDetectadaEnOtra, #DivRequiereAC, #DivNumeroNCAccionCorrectiva').hide();
 		document.getElementById('Proceso').length = 1;
+        $('#CodGestion, #Proceso, #DetectadaEn, #Tipo, #RequiereAC').trigger('change');
 
 		$("#ModalEditarNoConformidad").modal('show');
 	}else{
@@ -871,7 +872,7 @@ function MostrarDivEditarNoConformidad(mNumeroNC){
                 TipoModificar : '<?php echo md5('Ajax1JorA1NoConformidad'.date('d'));?>',
 				NumeroNC: mNumeroNC
             },
-			dataType: "json", // <--- Pide el JSON al servidor
+			dataType: "json", // Pide el JSON al servidor
 			cache: false,
 		}).done(function(data){
 			if(data.status === "Error" || data === "Error"){
@@ -880,6 +881,8 @@ function MostrarDivEditarNoConformidad(mNumeroNC){
 			}else{
 				// Asignamos los datos del JSON a los campos del formulario
 				document.getElementById('CodGestion').value = data.CodGestion;
+				
+				// Llamamos a la función que descarga los procesos
 				CambioGestionProceso(data.Proceso);
 				
 				document.getElementById('Responsable').value = data.NomResponsable;
@@ -896,7 +899,6 @@ function MostrarDivEditarNoConformidad(mNumeroNC){
 				document.getElementById('DetectadaEnOtra').value = data.DetectadaEnOtra;
 				document.getElementById('Descripcion').value = data.Descripcion;
 				document.getElementById('Correccion').value = data.Correccion;
-				document.getElementById('Observacion').value = data.Observacion || "";
 				document.getElementById('RequiereAC').value = data.RequiereAC;
 				
 				CambioTipo();
@@ -907,7 +909,8 @@ function MostrarDivEditarNoConformidad(mNumeroNC){
 				document.getElementById('FRevision').value = data.FRevision;
 				document.getElementById('FileNoConformidad').dataset.yacargado = data.YaCargado;
 				
-                $('#CodGestion, #Proceso, #DetectadaEn, #Tipo').trigger('change');
+                // Disparamos Select2 visualmente (El Proceso se dispara dentro de CambioGestionProceso)
+                $('#CodGestion, #DetectadaEn, #Tipo').trigger('change');
 
 				$("#ModalEditarNoConformidad").modal('show');
 			}
@@ -1009,6 +1012,9 @@ function AgregarSeguimiento(){
 			'checked': false
 		});
 		$(this).val(($(this).is(':checkbox') ? 1 : ''));
+
+    $(this).removeClass('hasDatepicker');
+
 	}).end().appendTo('#DivSeguimientos');
 	$('#SpanSeguimiento'+mRegNew).html(mRegNew);
 	$('#DivSeguimientos div[id^="DivSeguimiento1"]:last').show();
@@ -1118,27 +1124,37 @@ function GrabarCerrarNoConformidad(){
 		MostrarDatoObser("Los campos resaltados son obligatorios.", true);
 	}
 }
+let ultimaPeticionProceso = 0;
+let procesoPendiente = '';
+
 function CambioGestionProceso(mProceso=''){
-	mCodGestion=document.getElementById('CodGestion').value;
-	if(mCodGestion){
-		$.ajax({
-			type: "GET",
-			url: 'noconformidades.php',
-			data: {TipoModificar : '<?php echo md5('JorCambioGestionProceso'.date('d'));?>',
-					CodGestion:	mCodGestion,
-					Proceso:mProceso},
-			cache: false,
-		}).done(function(html){
-			if(html=="Error"){
-				MostrarDatoObser("Se presentó un error");
-				return false;
-			}else{
-				eval(html);
-			}
-		});
-	}else{
-		document.getElementById("Proceso").length=1;
-	}
+    const sel = document.getElementById('Proceso');
+    const mCodGestion = document.getElementById('CodGestion').value;
+    if(mProceso) procesoPendiente = mProceso;
+    const seleccionado = procesoPendiente || sel.value;
+    const id = ++ultimaPeticionProceso;
+
+    sel.length = 1;
+    if(!mCodGestion){ procesoPendiente = ''; $('#Proceso').trigger('change'); return; }
+
+    $.ajax({
+        type: "GET", url: 'noconformidades.php', dataType: "json", cache: false,
+        data: { TipoModificar: '<?php echo md5('JorCambioGestionProceso'.date('d'));?>',
+                CodGestion: mCodGestion }
+    }).done(function(r){
+        if(id !== ultimaPeticionProceso) return;   // respuesta vieja, se ignora
+        if(r.status !== 'success'){
+            MostrarDatoObser(r.message || "Se presentó un error", true);
+            return;
+        }
+        sel.length = 1;
+        r.procesos.forEach(p => sel.add(new Option(p.nombre, p.codigo)));
+        if(seleccionado && Array.from(sel.options).some(o => o.value === seleccionado)){
+            sel.value = seleccionado;
+        }
+        procesoPendiente = '';
+        $('#Proceso').trigger('change');
+    });
 }
 function CambioTipo(){
 	mCodTipo=document.getElementById('Tipo').value;
@@ -1407,6 +1423,9 @@ if($_GET['Filtrar']==1){?>
 	if($_GET['FiltroNumeroNC']){
         $Filtrico .= " AND FIND_IN_SET(NC.NumeroNC,'".$_GET['FiltroNumeroNC']."')";
     }else{
+        if ($_GET['FiltroCodGestion']){
+            $Filtrico .= " AND NC.CodGestion = '".addslashes($_GET['FiltroCodGestion'])."'";
+        }
         if($_GET['FiltroTipo']){
             $Filtrico.= " AND NC.Tipo = '".$_GET['FiltroTipo']."'";
         }
@@ -1580,10 +1599,6 @@ if($_GET['Filtrar']==1){?>
                             <div class="mb-3">
                                 <label for="Correccion" class="form-label text-muted small mb-1 fw-bold">Relación de actividades:</label>
                                 <textarea name="Correccion" id="Correccion" class="form-control form-control-sm" placeholder="Describa las actividades..." rows="3"></textarea>
-                            </div>
-                            <div class="mb-3">
-                                <label for="Observacion" class="form-label text-muted small mb-1 fw-bold">Observación:</label>
-                                <textarea name="Observacion" id="Observacion" class="form-control form-control-sm" placeholder="Ingrese sus observaciones aquí..." rows="3"></textarea>
                             </div>
                             <div class="mb-3" id="DivRequiereAC">
                                 <label for="RequiereAC" class="form-label text-muted small mb-1 fw-bold">¿Garantiza que la falla no se presente de nuevo?</label>
