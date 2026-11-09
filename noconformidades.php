@@ -13,7 +13,8 @@ $PuedeAdministrar = in_array($_SESSION['Usuario'], array(
     '1073696610',  // Jenniffer Bello
     '52841712',    // Diana Álvarez
     '1233909122',  // Eduardo León
-    '1022928448'   // JABIER BARRERA
+    '1022928448',   // JABIER BARRERA
+    '1013602451'
 ));
 
 $PuedeReversar = in_array($_SESSION['Usuario'], array(
@@ -704,6 +705,10 @@ $QueriGes  = "SELECT * FROM calidad.gestiones ORDER BY NomGestion";
 $ResultGes = $mysqli->query($QueriGes);
 
 // Listado de No Conformidades (consumido por la vista a través de $Result)
+if (!isset($_GET['Filtrar']) || (int)$_GET['Filtrar'] !== 1) {
+    $_GET['Filtrar'] = 1;
+}
+
 if ($_GET['Filtrar'] == 1) {
 
     if ($PuedeAdministrar) {
