@@ -766,16 +766,156 @@ body {
     word-wrap: break-word; /* Evita que palabras muy largas rompan la tabla */
 }
 
-/* Corrección del corte de texto en la descripción */
-.desc-limitada {
+/* Descripción resumida (3 líneas) + modal en móvil */
+.desc-cell { cursor: pointer; }
+.desc-text {
     display: -webkit-box;
-    -webkit-line-clamp: 2; /* Límite de 2 líneas */
+    -webkit-line-clamp: 3; /* Límite de 3 líneas */
     -webkit-box-orient: vertical;
     overflow: hidden;
     text-overflow: ellipsis;
-    line-height: 1.4; /* Altura de línea definida */
-    max-height: 2.8em; /* Exactamente el doble del line-height para que no corte letras */
+    line-height: 1.4;
+    max-height: 4.2em;
     white-space: normal;
+    word-break: break-word;
+    overflow-wrap: anywhere;
+}
+.desc-hint {
+    display: none;
+    margin-top: 3px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: var(--accent-gold);
+    text-transform: uppercase;
+    letter-spacing: .3px;
+}
+.desc-hint::after { content: 'Ver descripción completa ›'; }
+
+/* Fila presionada en móvil */
+.fila-seleccionada > td {
+    border-top: 2px solid #2563eb !important;
+    border-bottom: 2px solid #2563eb !important;
+}
+.fila-seleccionada > td:first-child { border-left: 2px solid #2563eb !important; }
+.fila-seleccionada > td:last-child { border-right: 2px solid #2563eb !important; }
+
+/* Campo de archivo integrado (evita el control nativo frágil) */
+#FileNoConformidad::file-selector-button {
+    background: var(--primary-dark);
+    color: #fff;
+    border: 0;
+    border-radius: 6px;
+    padding: 0.35rem 0.85rem;
+    margin-right: 0.65rem;
+    cursor: pointer;
+}
+#FileNoConformidad::file-selector-button:hover { background: #121f3a; }
+#FileNoConformidad { color: #6c757d; }
+
+/* Modal de descripción */
+#ModalDescripcionNoConformidad .modal-body {
+    white-space: pre-wrap;
+    word-break: break-word;
+    overflow-wrap: anywhere;
+    font-size: 0.92rem;
+    line-height: 1.55;
+    max-height: 60vh;
+    overflow-y: auto;
+}
+
+/* Acciones dentro de la fila/card */
+.acciones-cell { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.fecha-cierre { font-size: 0.75rem; font-weight: 600; }
+
+/* Paginación */
+.nc-pagination {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 10px 4px 0;
+    flex-wrap: wrap;
+}
+.nc-pagination-info { font-size: 0.78rem; color: #6c757d; }
+.nc-pagination-controls { display: flex; align-items: center; gap: 5px; flex-wrap: wrap; }
+.page-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 32px;
+    height: 32px;
+    padding: 0 9px;
+    border: 1px solid #dee2e6;
+    border-radius: 7px;
+    background: #fff;
+    color: #495057;
+    font-size: 0.78rem;
+    font-weight: 600;
+    text-decoration: none;
+}
+.page-btn:hover { border-color: var(--accent-gold); color: var(--accent-gold); background: #fffaf0; text-decoration: none; }
+.page-btn.active { background: var(--primary-dark); border-color: var(--primary-dark); color: #fff; }
+.page-btn.disabled { opacity: .45; pointer-events: none; }
+.page-ellipsis { color: #6c757d; padding: 0 3px; }
+
+/* Tabla como cards en móvil */
+@media (max-width: 767px) {
+    .tableFixHead {
+        height: auto;
+        min-height: 0;
+        overflow: visible;
+        background: transparent;
+        box-shadow: none;
+        border-radius: 0;
+    }
+    .tableFixHead .table { min-width: 0; table-layout: auto; }
+    .tableFixHead thead { display: none; }
+    .tableFixHead table,
+    .tableFixHead tbody,
+    .tableFixHead tr,
+    .tableFixHead td { display: block; width: 100%; }
+    .tableFixHead tbody tr {
+        background: #fff !important;
+        border: 1.5px solid #dee2e6;
+        border-radius: 10px;
+        padding: 12px 14px;
+        margin-bottom: 10px;
+        box-shadow: 0 1px 3px rgba(0,0,0,.06);
+        cursor: pointer;
+    }
+    .tableFixHead tbody tr:hover { background: #fafcff !important; }
+    .tableFixHead tbody tr td {
+        padding: 6px 0 !important;
+        border: none !important;
+        text-align: left !important;
+        font-size: 12.5px;
+        word-break: break-word;
+    }
+    .tableFixHead tbody td::before {
+        content: attr(data-label);
+        display: block;
+        font-size: 10px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: .4px;
+        color: #6c757d;
+        margin-bottom: 2px;
+    }
+    .tableFixHead tbody tr td:last-child {
+        border-top: 1px dashed #dee2e6 !important;
+        padding-top: 10px !important;
+        margin-top: 6px;
+    }
+    .tableFixHead tbody td.desc-cell .desc-text { -webkit-line-clamp: 3; }
+    .tableFixHead tbody td.desc-cell .desc-hint { display: inline-block; }
+    .tableFixHead tbody tr.fila-seleccionada {
+        border-color: #2563eb !important;
+        box-shadow: 0 0 0 2px rgba(37,99,235,.22), 0 1px 3px rgba(0,0,0,.06) !important;
+    }
+    .nc-pagination { flex-direction: column; align-items: stretch; }
+    .nc-pagination-info { text-align: center; }
+    .nc-pagination-controls { justify-content: center; }
+    .page-btn { min-width: 36px; height: 36px; }
 }
 /* Ajuste Select2 al nuevo diseño */
 .select2-container--bootstrap-5 .select2-selection { border-radius: 8px; font-size: 0.85rem; border-color: #dee2e6; padding: 0.15rem; }
