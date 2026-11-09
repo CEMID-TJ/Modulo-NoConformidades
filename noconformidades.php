@@ -13,7 +13,7 @@ $PuedeAdministrar = in_array($_SESSION['Usuario'], array(
     '1073696610',  // Jenniffer Bello
     '52841712',    // Diana Álvarez
     '1233909122',  // Eduardo León
-    '1022928448',   // JABIER BARRERA
+    '1022928448',  // JABIER BARRERA
     '1013602451'
 ));
 
@@ -723,6 +723,10 @@ if ($_GET['Filtrar'] == 1) {
     if ($_GET['FiltroNumeroNC']) {
         $Filtrico .= " AND FIND_IN_SET(NC.NumeroNC, '" . $_GET['FiltroNumeroNC'] . "')";
     } else {
+        // Filtro por Gestión
+        if (!empty($_GET['FiltroCodGestion'])) {
+            $Filtrico .= " AND NC.CodGestion = '" . $mysqli->real_escape_string($_GET['FiltroCodGestion']) . "'";
+        }
         if ($_GET['FiltroTipo']) {
             $Filtrico .= " AND NC.Tipo = '" . $_GET['FiltroTipo'] . "'";
         }
@@ -1158,8 +1162,9 @@ if ($_GET['Filtrar'] == 1) {
             .navbar-toggle { margin: 6px 0; padding: 7px 9px; }
             .navbar .collapse { border-top: 1px solid var(--border); margin-top: 6px; padding-top: 6px; }
             .navbar .collapse form > .col-sm-10 { width: 100%; float: none; padding: 0 !important; }
+            .navbar .collapse form > .col-sm-10::after { content: ""; display: table; clear: both; }
             .navbar .collapse form > .col-sm-10 > .form-group { width: 50%; float: left; padding: 2px 4px !important; }
-            .navbar .collapse form > .col-sm-2 { width: 100%; float: none; padding: 4px !important; }
+            .navbar .collapse form > .col-sm-2 { width: 100%; float: none; padding: 4px !important; clear: both; }
             .navbar .form-control { height: 36px !important; font-size: 12px; padding: 5px 8px; }
 
             .actions-box { width: 100%; height: auto; min-height: 52px; padding: 4px; gap: 4px; justify-content: center; box-sizing: border-box; }
@@ -1241,7 +1246,7 @@ if ($_GET['Filtrar'] == 1) {
             .d-none-mobile { display: none !important; }
         }
         @media (max-width: 480px) {
-            .navbar .collapse form > .col-sm-10 > .form-group { width: 100%; }
+            .navbar .collapse form > .col-sm-10 > .form-group { width: 100%; float: none; }
             .nc-box .nc-row { flex-direction: column; gap: 8px; }
             .nc-box .nc-cell-4, .nc-box .nc-cell-6, .nc-box .nc-cell-8 { flex: 1 1 100%; width: 100%; }
             .modal-footer { flex-direction: column; }
@@ -1271,20 +1276,21 @@ if ($_GET['Filtrar'] == 1) {
 
             $("#FApertura, #FRevision, #FCierre").datepicker({ dateFormat: 'dd-mm-yy', showOn: 'focus' });
 
+            /* ===== Fix responsive: no ajustar la altura mientras el menú está abierto ===== */
             function AjustarAlturaMenu() {
                 var nav = document.querySelector('.navbar-fixed-top');
-                if (nav) {
-                    var alto = nav.offsetHeight;
-                    document.body.style.paddingTop = alto + 'px';
-                    document.documentElement.style.setProperty('--navbar-height', alto + 'px');
+                if (!nav) return;
+                if (nav.querySelector('.navbar-collapse.in')) {
+                    return;
                 }
+                var alto = nav.offsetHeight;
+                document.body.style.paddingTop = alto + 'px';
+                document.documentElement.style.setProperty('--navbar-height', alto + 'px');
             }
             AjustarAlturaMenu();
-            $(window).on('resize', AjustarAlturaMenu);
             $(window).on('load', AjustarAlturaMenu);
-            $('.navbar-collapse').on('shown.bs.collapse hidden.bs.collapse', AjustarAlturaMenu);
-            var navMenu = document.querySelector('.navbar-fixed-top');
-            if (navMenu && window.ResizeObserver) { new ResizeObserver(AjustarAlturaMenu).observe(navMenu); }
+            $(window).on('resize', AjustarAlturaMenu);
+            $('.navbar-collapse').on('hidden.bs.collapse', AjustarAlturaMenu);
             $(document).on('shown.bs.modal hidden.bs.modal', function () { AjustarAlturaMenu(); });
         });
 
@@ -1336,7 +1342,7 @@ if ($_GET['Filtrar'] == 1) {
         }
 
         function ValidarFiltros() {
-            var filtros = ['FiltroProceso', 'FiltroTipo', 'FiltroTipoAcciones', 'FiltroNumeroNC'];
+            var filtros = ['FiltroCodGestion', 'FiltroProceso', 'FiltroTipo', 'FiltroTipoAcciones', 'FiltroNumeroNC'];
             var tieneFiltro = false;
             for (var i = 0; i < filtros.length; i++) {
                 var el = document.getElementById(filtros[i]);
@@ -1344,7 +1350,7 @@ if ($_GET['Filtrar'] == 1) {
             }
             if (!tieneFiltro) {
                 MostrarDatoObser('<i class="bi bi-exclamation-triangle"></i> Debe seleccionar al menos un criterio de búsqueda.');
-                $('#FiltroProceso, #FiltroTipo, #FiltroTipoAcciones, #FiltroNumeroNC').each(function () {
+                $('#FiltroCodGestion, #FiltroProceso, #FiltroTipo, #FiltroTipoAcciones, #FiltroNumeroNC').each(function () {
                     $(this).addClass('alert-danger');
                     setTimeout(function (el) { $(el).removeClass('alert-danger'); }, 1800, this);
                 });
@@ -1757,7 +1763,21 @@ if ($_GET['Filtrar'] == 1) {
                 <input name="Filtrar" type="hidden" id="Filtrar" value="1">
 
                 <div class="col-sm-10 form-group" style="padding-top:6px">
-                    <div class="col-sm-3 form-group">
+                    <div class="col-sm-2 form-group">
+                        <select name="FiltroCodGestion" class="form-control" id="FiltroCodGestion">
+                            <option value="" selected>Gestión</option>
+                            <?php
+                            mysqli_data_seek($ResultGes, 0);
+                            for ($j = 1; $j <= $ResultGes->num_rows; $j++) {
+                                $RowGes = $ResultGes->fetch_assoc();
+                                ?>
+                                <option value="<?php echo $RowGes['CodGestion']; ?>" <?php if ($_GET['FiltroCodGestion'] == $RowGes['CodGestion']) echo "selected"; ?>><?php echo $RowGes['NomGestion']; ?></option>
+                                <?php
+                            }
+                            ?>
+                        </select>
+                    </div>
+                    <div class="col-sm-2 form-group">
                         <select name="FiltroProceso" class="form-control" id="FiltroProceso">
                             <option value="" selected>cualquier proceso</option>
                             <?php
@@ -1798,7 +1818,7 @@ if ($_GET['Filtrar'] == 1) {
                             <option value=1 <?php if ($_GET['Ordencito'] == 1) echo "selected"; ?>>Ordenar por Número</option>
                         </select>
                     </div>
-                    <div class="col-sm-3 form-group">
+                    <div class="col-sm-2 form-group">
                         <input type="text" name="FiltroNumeroNC" id="FiltroNumeroNC" class="form-control" placeholder="N° reg" value="<?php echo $_GET['FiltroNumeroNC']; ?>">
                     </div>
                 </div>
