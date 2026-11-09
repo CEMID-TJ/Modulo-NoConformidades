@@ -405,7 +405,8 @@ elseif ($_GET['TipoModificar'] == md5('AjaxSeguimientos' . date('d')) and $_GET[
 
             <div class="col-sm-3 form-group">
                 <label class="label-xsmall">Fecha Seguimiento</label>
-                <input type="text" name="Fecha<?php echo $mRegistro; ?>" id="Fecha<?php echo $mRegistro; ?>" class="form-control" onChange="ValidarFecha(this)" onBlur="ValidarFecha(this)" value="<?php echo DarFecha($RowNCS["Fecha"]); ?>">
+                <input type="text" name="Fecha<?php echo $mRegistro; ?>" id="Fecha<?php echo $mRegistro; ?>" class="form-control" placeholder="dd/mm/aaaa" onChange="ValidarFecha(this)" onBlur="ValidarFecha(this)" value="<?php echo DarFecha($RowNCS["Fecha"]); ?>">
+                <small class="date-hint">Formato: dd/mm/aaaa</small>
             </div>
 
             <div class="col-sm-5 form-group">
@@ -895,6 +896,27 @@ $ResultGes = $mysqli->query("SELECT * FROM calidad.gestiones ORDER BY NomGestion
             border-color: var(--primary) !important;
             box-shadow: 0 0 0 3px rgba(37, 99, 235, .18) !important;
             outline: none;
+        }
+
+        /* Placeholder de fecha en gris, visible en todos los navegadores */
+        .form-control::placeholder {
+            color: #94a3b8;
+            opacity: 1;
+        }
+        .form-control::-webkit-input-placeholder {
+            color: #94a3b8;
+            opacity: 1;
+        }
+
+        /* Texto auxiliar de formato debajo de los campos de fecha */
+        .date-hint {
+            display: block;
+            margin-top: 3px;
+            font-size: 10.5px;
+            color: #94a3b8;
+            font-weight: 500;
+            letter-spacing: .2px;
+            text-transform: none;
         }
 
         input.form-control[readonly] {
@@ -2779,7 +2801,8 @@ $ResultGes = $mysqli->query("SELECT * FROM calidad.gestiones ORDER BY NomGestion
 
                             <div class="form-group">
                                 <label for="FApertura">Fecha de apertura</label>
-                                <input type="text" name="FApertura" id="FApertura" class="form-control" onChange="ValidarFecha(this)" onBlur="ValidarFecha(this)">
+                                <input type="text" name="FApertura" id="FApertura" class="form-control" placeholder="dd/mm/aaaa" onChange="ValidarFecha(this)" onBlur="ValidarFecha(this)">
+                                <small class="date-hint">Formato: dd/mm/aaaa</small>
                             </div>
 
                             <div class="nc-row">
@@ -2849,7 +2872,8 @@ $ResultGes = $mysqli->query("SELECT * FROM calidad.gestiones ORDER BY NomGestion
 
                             <div class="form-group">
                                 <label for="FRevision">Fecha acordada para la revisión</label>
-                                <input type="text" name="FRevision" id="FRevision" class="form-control" onChange="ValidarFecha(this)" onBlur="ValidarFecha(this)">
+                                <input type="text" name="FRevision" id="FRevision" class="form-control" placeholder="dd/mm/aaaa" onChange="ValidarFecha(this)" onBlur="ValidarFecha(this)">
+                                <small class="date-hint">Formato: dd/mm/aaaa</small>
                             </div>
 
                             <div class="form-group">
@@ -2930,7 +2954,8 @@ $ResultGes = $mysqli->query("SELECT * FROM calidad.gestiones ORDER BY NomGestion
                     </div>
                     <div class="col-sm-2 form-group">
                         <label for="FCierre">Fecha del Cierre</label>
-                        <input type="text" name="FCierre" id="FCierre" class="form-control" onChange="ValidarFecha(this)" onBlur="ValidarFecha(this)">
+                        <input type="text" name="FCierre" id="FCierre" class="form-control" placeholder="dd/mm/aaaa" onChange="ValidarFecha(this)" onBlur="ValidarFecha(this)">
+                        <small class="date-hint">Formato: dd/mm/aaaa</small>
                     </div>
                     <div class="col-sm-4 form-group">
                         <label for="RCierre">Responsable del Cierre</label>
