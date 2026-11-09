@@ -5,33 +5,72 @@ include('../funciones.php');
 
 $PuedeAdministrar = in_array($_SESSION['Usuario'], array(
     (InList($_SESSION["Perfil"], "ADMIN") ? $_SESSION['Usuario'] : "98381246"),
-    '79558178',       // CAMILO VELANDIA
-    '1054540722',     // Johan Rodriguez
-    '1014305622',     // Laura Valentina
-    '1073696610',     // Jenniffer Bello
-    '52841712',       // Diana Álvarez
-    '1233909122',     // Eduardo León
-    '1022928448'      // JABIER BARRERA
+    '79558178',      // CAMILO VELANDIA
+    '79855287',      // Humberto Córdoba
+    '1013602451',    // Thomas Barrero
+    '1014305622',    // Laura Valentina
+    '1073696610',    // Jenniffer Bello
+    '52841712',      // Diana Álvarez
+    '1233909122',    // Eduardo León
+    '1022928448'     // JABIER BARRERA
 ));
 
 $PuedeReversar = in_array($_SESSION['Usuario'], array(
     (InList($_SESSION["Perfil"], "ADMIN") ? $_SESSION['Usuario'] : "98381246"),
-    '1014305622',
-    '1073696610',
-    '1233909122',
-    '1022928448'
+    '1014305622',    // Laura Valentina
+    '1073696610',    // Jenniffer Bello
+    '1233909122',    // Eduardo León
+    '1022928448'     // JABIER BARRERA
 ));
 
 $PuedeGeneral = in_array($_SESSION['Usuario'], array(
     (InList($_SESSION["Perfil"], "ADMIN") ? $_SESSION['Usuario'] : "98381246"),
-    '39665007', '79404413', '8730314', '37829191', '40025213', '41405252',
-    '79879905', '39668167', '1072665948', '52903643', '1032380671', '52378375',
-    '52226604', '80241390', '52849113', '1024471606', '53048628', '52382262',
-    '52159469', '53067789', '1024509359', '32764527', '63347978', '63489430',
-    '1098682989', '37556707', '1010171514', '1023861416', '79844012', '52190948',
-    '1024539393', '1073152711', '1023013296', '1014220582', '1015428198',
-    '1030610691', '1022340598', '1022415485', '52803785', '37547875', '37752414',
-    '52233576', '1019050390', '1073696610', '1014305622', '3276248'
+    '39665007',   // MarthaCV
+    '79404413',   // Alvaro Parra
+    '8730314',    // JavierM
+    '37829191',   // Nelcy Jerez
+    '40025213',   // Consuelo Ramirez
+    '41405252',   // Luz M
+    '79879905',   // CarlosL
+    '39668167',   // Marcela Piñeros
+    '1072665948', // Jessica Agudelo
+    '52903643',   // CASALLAS DEICY
+    '1032380671', // ARDILA GISSED
+    '52378375',   // CASTAÑEDA LINA
+    '52226604',   // PARROQUIANO MARYSOL
+    '80241390',   // ARIAS FABIO
+    '52849113',   // PULIDO PEREZ CATERYN
+    '1024471606', // JUDY ANDREA RUEDA GOMEZ
+    '53048628',   // FLOREZ CASTAÑEDA DIANA CAROLINA
+    '52382262',   // SABOGAL CORTES FLOR XIMENA
+    '52159469',   // CASTILLO MARTINEZ IVONNE ASTRID
+    '53067789',   // RODRIGUEZ MUÑOZ VIVIANA EMILCE
+    '1024509359', // SEMA CASTIBLANCO MARIA TERESA
+    '32764527',   // OCHOA BOHORQUEZ SANDRA YODANY
+    '63347978',   // RAMIREZ TOLOZA CLARA EUGENIA
+    '63489430',   // BAUTISTA GONZALEZ LILIA CELINA
+    '1098682989', // BRAVO PACHECO YANETH NATALIA
+    '37556707',   // RAMIREZ CARRILLO DEISY
+    '1010171514', // CUBILLOS CABRERA PAUL BRAYAN
+    '1023861416', // ZAMBRANO SABOGAL PEDRO PABLO
+    '79844012',   // ROMERO TIJO NESTOR RAUL
+    '52190948',   // QUIÑONES DIAZ AIDA YANETH
+    '1024539393', // PITA FUQUENE LEIDY JOHANA
+    '1073152711', // TELLEZ LOZANO SANDRA PATRICIA
+    '1023013296', // CUBIDES MORENO NATHALIA
+    '1014220582', // SERENY JIMENEZ JULIET FERNANDA
+    '1015428198', // CONEO JARABA KARINA KAROLAY
+    '1030610691', // GONZALEZ DELGADO YESICA PAOLA
+    '1022340598', // LONDOÑO MICHAEL
+    '1022415485', // GAONA ARANGO LAURA ROCIO
+    '52803785',   // CUELLAR PIZA ERIKA MILENA
+    '37547875',   // CABALLERO GRATZ MARYLUZ
+    '37752414',   // CASADIEGO CUAO ADELINA ESTER
+    '52233576',   // PIZA CAMACHO SANDRA MILENA
+    '1019050390', // GUTIERREZ RODRIGUEZ YINETH ROCIO
+    '1073696610', // JENIFFER BELLO MAYORGA
+    '1014305622', // LAURA GONZÁLEZ
+    '3276248'     // GustavoG
 ));
 
 $mTipoRegistro = array(
@@ -232,7 +271,7 @@ if ($_GET['TipoModificar'] == md5('AjaxMostrarNoConformidad' . date('d')) and $_
 }
 
 /* ============================================================================
-   [PHP - AJAX] Datos para edición (JSON)
+   [PHP - AJAX] Datos para edición de una No Conformidad (JSON)
    ============================================================================ */
 elseif ($_GET['TipoModificar'] == md5('Ajax1JorA1NoConformidad' . date('d')) and $_GET['NumeroNC']) {
 
@@ -280,7 +319,7 @@ elseif ($_GET['TipoModificar'] == md5('Ajax1JorA1NoConformidad' . date('d')) and
 }
 
 /* ============================================================================
-   [PHP - AJAX] Grabado (INSERT/UPDATE) (JSON)
+   [PHP - AJAX] Grabado (INSERT/UPDATE) de una No Conformidad (JSON)
    ============================================================================ */
 elseif ($_POST['TipoModificar'] == md5('JorGrabarNoConformidad' . date('d')) and $_POST['TipoGrabar'] == 'GrabarNoConformidad' and $_POST['NumeroNC']) {
 
@@ -318,6 +357,7 @@ elseif ($_POST['TipoModificar'] == md5('JorGrabarNoConformidad' . date('d')) and
             or die(json_encode(["status" => "error", "message" => mysqli_error($mysqli)]));
     }
 
+    /* Validación y subida del archivo PDF */
     if (isset($_FILES['FileNoConformidad']) && $_FILES['FileNoConformidad']['error'] === UPLOAD_ERR_OK) {
         if ($_FILES['FileNoConformidad']['size'] <= 4 * 1024 * 1024) {
             $finfo = finfo_open(FILEINFO_MIME_TYPE);
@@ -331,7 +371,9 @@ elseif ($_POST['TipoModificar'] == md5('JorGrabarNoConformidad' . date('d')) and
         }
     }
 
+    /* Notificación por correo si la NC viene de una queja */
     if ($_POST['DetectadaEn'] == 'Quejas' and intval($_POST['DetectadaEnOtra'])) {
+
         $mysqli->query("UPDATE calidad.quejas SET NumeroNC='" . $_POST['NumeroNC'] . "' WHERE IDQueja='" . intval($_POST['DetectadaEnOtra']) . "' LIMIT 1");
 
         $Row = $mysqli->query("SELECT NC.*, CONCAT(E.Nom, ' ', E.Apellido1) AS NomResponsable, QQueja.IDQueja, QQueja.Queja, Pr.Dueproceso
@@ -374,7 +416,7 @@ elseif ($_POST['TipoModificar'] == md5('JorGrabarNoConformidad' . date('d')) and
 }
 
 /* ============================================================================
-   [PHP - AJAX] Seguimientos para edición (HTML)
+   [PHP - AJAX] Consulta de seguimientos para edición (HTML)
    ============================================================================ */
 elseif ($_GET['TipoModificar'] == md5('AjaxSeguimientos' . date('d')) and $_GET['NumeroNC']) {
 
@@ -406,7 +448,6 @@ elseif ($_GET['TipoModificar'] == md5('AjaxSeguimientos' . date('d')) and $_GET[
             <div class="col-sm-3 form-group">
                 <label class="label-xsmall">Fecha Seguimiento</label>
                 <input type="text" name="Fecha<?php echo $mRegistro; ?>" id="Fecha<?php echo $mRegistro; ?>" class="form-control" placeholder="dd/mm/aaaa" onChange="ValidarFecha(this)" onBlur="ValidarFecha(this)" value="<?php echo DarFecha($RowNCS["Fecha"]); ?>">
-                <small class="date-hint">Formato: dd/mm/aaaa</small>
             </div>
 
             <div class="col-sm-5 form-group">
@@ -519,7 +560,7 @@ elseif ($_POST['TipoModificar'] == md5('JorCerrarNoConformidad' . date('d')) and
 }
 
 /* ============================================================================
-   [PHP - AJAX] Recarga del listado de procesos (JSON)
+   [PHP - AJAX] Recarga del listado de procesos según la gestión seleccionada (JSON)
    ============================================================================ */
 elseif ($_GET['TipoModificar'] == md5('JorCambioGestionProceso' . date('d')) and $_GET['CodGestion']) {
 
@@ -534,13 +575,11 @@ elseif ($_GET['TipoModificar'] == md5('JorCambioGestionProceso' . date('d')) and
     } else {
         $QueriProc = "SELECT Colegio, CodProceso, NomProceso
                       FROM calidad.procesos
-                      WHERE CodGestion='" . $CodGestion . "'
-                      AND FIND_IN_SET('" . $Usuario . "', DueProceso)
+                      WHERE CodGestion='" . $CodGestion . "' AND FIND_IN_SET('" . $Usuario . "', DueProceso)
                       ORDER BY NomProceso";
     }
 
-    $ResultProc = $mysqli->query($QueriProc)
-        or die(json_encode(["status" => "error", "message" => mysqli_error($mysqli)]));
+    $ResultProc = $mysqli->query($QueriProc) or die(json_encode(["status" => "error", "message" => mysqli_error($mysqli)]));
 
     $procesos = [];
     while ($RowProc = $ResultProc->fetch_assoc()) {
@@ -556,7 +595,7 @@ elseif ($_GET['TipoModificar'] == md5('JorCambioGestionProceso' . date('d')) and
 }
 
 /* ============================================================================
-   [PHP - AJAX] Generación del reporte JSON para Excel
+   [PHP - AJAX] Generación del reporte en formato JSON para exportar a Excel
    ============================================================================ */
 elseif ($_GET['TipoModificar'] == 'EnviarReportes' and $_GET['TipoGrabar'] == md5('JorEnviarReportes' . date('d'))) {
 
@@ -654,7 +693,7 @@ elseif ($_GET['TipoModificar'] == 'EnviarReportes' and $_GET['TipoGrabar'] == md
 }
 
 /* ============================================================================
-   [PHP - AJAX] Reversión (JSON)
+   [PHP - AJAX] Reversión de una No Conformidad cerrada (JSON)
    ============================================================================ */
 elseif ($_POST['TipoModificar'] == md5('JorReversarNoConformidad' . date('d')) and $_POST['TipoGrabar'] == 'ReversarNoConformidad' and $_POST['NumeroNC']) {
 
@@ -698,7 +737,7 @@ $ResultGes = $mysqli->query("SELECT * FROM calidad.gestiones ORDER BY NomGestion
     <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, viewport-fit=cover">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black">
-    <meta name="theme-color" content="#2563eb">
+    <meta name="theme-color" content="#eb2525">
     <title>MANEJO DE NO CONFORMIDADES Y MEJORAS</title>
 
     <link rel="stylesheet" href="../librerias/jquery/jquery-ui.css">
@@ -707,8 +746,8 @@ $ResultGes = $mysqli->query("SELECT * FROM calidad.gestiones ORDER BY NomGestion
     <script src="../librerias/jquery/jquery-1.10.2.js"></script>
     <script src="../librerias/jquery/jquery-ui.js"></script>
 
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+    <link rel="stylesheet" href="../librerias/bootstrap-3.3.7-dist/css/bootstrap.min.css">
+    <script src="../librerias/bootstrap-3.3.7-dist/js/bootstrap.min.js"></script>
     <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
     <script src="../funciones.js"></script>
 
@@ -896,27 +935,6 @@ $ResultGes = $mysqli->query("SELECT * FROM calidad.gestiones ORDER BY NomGestion
             border-color: var(--primary) !important;
             box-shadow: 0 0 0 3px rgba(37, 99, 235, .18) !important;
             outline: none;
-        }
-
-        /* Placeholder de fecha en gris, visible en todos los navegadores */
-        .form-control::placeholder {
-            color: #94a3b8;
-            opacity: 1;
-        }
-        .form-control::-webkit-input-placeholder {
-            color: #94a3b8;
-            opacity: 1;
-        }
-
-        /* Texto auxiliar de formato debajo de los campos de fecha */
-        .date-hint {
-            display: block;
-            margin-top: 3px;
-            font-size: 10.5px;
-            color: #94a3b8;
-            font-weight: 500;
-            letter-spacing: .2px;
-            text-transform: none;
         }
 
         input.form-control[readonly] {
@@ -1246,15 +1264,17 @@ $ResultGes = $mysqli->query("SELECT * FROM calidad.gestiones ORDER BY NomGestion
         }
         .modal-title i { color: var(--primary); font-size: 18px; }
 
-        .modal-header .btn-close {
+        .modal-header .close {
             opacity: .55;
-            font-size: 20px;
+            font-size: 24px;
+            font-weight: 300;
+            color: var(--text-muted);
             transition: all .15s;
-            filter: grayscale(100%);
+            text-shadow: none !important;
         }
-        .modal-header .btn-close:hover {
+        .modal-header .close:hover {
             opacity: 1;
-            filter: none;
+            color: var(--danger);
             transform: rotate(90deg);
         }
 
@@ -1273,7 +1293,7 @@ $ResultGes = $mysqli->query("SELECT * FROM calidad.gestiones ORDER BY NomGestion
             overflow-y: auto;
         }
 
-        /* ---------- Adjuntar archivo (icono PDF en rojo directo) ---------- */
+        /* ---------- Adjuntar archivo ---------- */
         .btn-file.modern-file-input {
             display: flex !important;
             align-items: center;
@@ -1293,27 +1313,22 @@ $ResultGes = $mysqli->query("SELECT * FROM calidad.gestiones ORDER BY NomGestion
             cursor: pointer;
             user-select: none;
         }
-        .btn-file.modern-file-input:hover {
-            background: var(--danger-bg) !important;
-            border-color: var(--danger) !important;
+        .btn-file.modern-file-input,
+        .btn-file.modern-file-input * {
             color: var(--danger) !important;
         }
 
-        /* Icono: SIEMPRE rojo por defecto */
         .btn-file.modern-file-input i {
             font-size: 20px;
-            color: var(--danger) !important;
         }
-        .btn-file.modern-file-input:hover i {
+
+        .btn-file.modern-file-input:hover,
+        .btn-file.modern-file-input:hover * {
             color: var(--danger-hover) !important;
         }
 
-        .btn-file.modern-file-input.archivo-cargado {
-            border-color: var(--success-border) !important;
-            background: var(--success-bg) !important;
-            color: var(--success-hover) !important;
-        }
-        .btn-file.modern-file-input.archivo-cargado i {
+        .btn-file.modern-file-input.archivo-cargado,
+        .btn-file.modern-file-input.archivo-cargado * {
             color: var(--success-hover) !important;
         }
 
@@ -1444,16 +1459,19 @@ $ResultGes = $mysqli->query("SELECT * FROM calidad.gestiones ORDER BY NomGestion
            RESPONSIVE
            ========================================================== */
 
+        /* Tablet */
         @media (max-width: 991px) {
             .container { width: 100%; padding: 0 12px; }
             .btn-nav { width: 34px; height: 34px; }
         }
 
+        /* Móvil */
         @media (max-width: 767px) {
             body { font-size: 13px; }
 
             .container { width: 100%; padding: 0 8px; }
 
+            /* Navbar compacto */
             .navbar-default {
                 padding: 6px 10px;
                 min-height: 52px;
@@ -1476,6 +1494,7 @@ $ResultGes = $mysqli->query("SELECT * FROM calidad.gestiones ORDER BY NomGestion
                 padding: 7px 9px;
             }
 
+            /* Menú desplegado: filtros en 2 columnas */
             .navbar .collapse {
                 border-top: 1px solid var(--border);
                 margin-top: 6px;
@@ -1502,6 +1521,7 @@ $ResultGes = $mysqli->query("SELECT * FROM calidad.gestiones ORDER BY NomGestion
                 padding: 5px 8px;
             }
 
+            /* Caja de acciones: ancho completo, botones táctiles */
             .actions-box {
                 width: 100%;
                 height: auto;
@@ -1517,6 +1537,7 @@ $ResultGes = $mysqli->query("SELECT * FROM calidad.gestiones ORDER BY NomGestion
                 font-size: 18px;
             }
 
+            /* ================== TABLA COMO CARDS ================== */
             .tableFixHead.table-responsive {
                 border: none;
                 border-radius: 0;
@@ -1578,6 +1599,7 @@ $ResultGes = $mysqli->query("SELECT * FROM calidad.gestiones ORDER BY NomGestion
                 margin-top: 6px;
             }
 
+            /* Descripción resumida; al tocar la tarjeta se abre el modal con el texto completo */
             .tableFixHead tbody td.desc-cell { cursor: pointer; }
             .tableFixHead tbody td.desc-cell .desc-text {
                 display: -webkit-box;
@@ -1598,11 +1620,13 @@ $ResultGes = $mysqli->query("SELECT * FROM calidad.gestiones ORDER BY NomGestion
             }
             .tableFixHead tbody td.desc-cell .desc-hint::after { content: 'Ver descripción completa ›'; }
 
+            /* Fila seleccionada al presionar */
             .tableFixHead tbody tr.fila-seleccionada {
                 border-color: var(--primary) !important;
                 box-shadow: 0 0 0 2px rgba(37, 99, 235, .22), var(--shadow-sm) !important;
             }
 
+            /* Paginación en móvil */
             .nc-pagination {
                 padding: 10px 12px;
                 flex-direction: column;
@@ -1613,6 +1637,7 @@ $ResultGes = $mysqli->query("SELECT * FROM calidad.gestiones ORDER BY NomGestion
             .nc-pagination-controls { justify-content: center; }
             .page-btn { min-width: 36px; height: 36px; }
 
+            /* Acciones dentro de la card */
             .acciones-cell {
                 justify-content: flex-start;
                 gap: 6px;
@@ -1631,6 +1656,7 @@ $ResultGes = $mysqli->query("SELECT * FROM calidad.gestiones ORDER BY NomGestion
                 margin-right: 4px;
             }
 
+            /* Modales full-width */
             .modal-dialog {
                 margin: 8px auto !important;
                 width: calc(100% - 16px) !important;
@@ -1656,6 +1682,7 @@ $ResultGes = $mysqli->query("SELECT * FROM calidad.gestiones ORDER BY NomGestion
                 max-height: calc(100vh - 140px);
             }
 
+            /* Formulario NC: 3 cajas se apilan */
             #FrmNoConformidad { gap: 10px; }
             #FrmNoConformidad > .col-sm-4 {
                 flex: 1 1 100%;
@@ -1666,6 +1693,7 @@ $ResultGes = $mysqli->query("SELECT * FROM calidad.gestiones ORDER BY NomGestion
 
             .nc-box { padding: 14px 12px; gap: 10px; }
 
+            /* Seguimientos */
             .nc-section { padding: 12px 10px !important; }
             .seguimiento-header {
                 margin: 0 0 8px 0;
@@ -1684,11 +1712,13 @@ $ResultGes = $mysqli->query("SELECT * FROM calidad.gestiones ORDER BY NomGestion
                 height: 42px;
             }
 
+            /* Botón archivo */
             .btn-file.modern-file-input {
                 padding: 12px 14px !important;
                 font-size: 12px;
             }
 
+            /* Alertas */
             .myAlert-top {
                 min-width: auto;
                 width: 92%;
@@ -1697,14 +1727,18 @@ $ResultGes = $mysqli->query("SELECT * FROM calidad.gestiones ORDER BY NomGestion
                 top: 70px;
             }
 
+            /* Textareas */
             textarea.form-control { min-height: 70px; }
 
+            /* Paneles de consulta */
             .nc-field { padding: 10px 12px !important; }
             .nc-value { font-size: 13px; }
 
+            /* Etiqueta de basurero: oculta el label de espacio en móvil */
             .d-none-mobile { display: none !important; }
         }
 
+        /* Móviles pequeños */
         @media (max-width: 480px) {
             .navbar .collapse form > .col-sm-10 > .form-group {
                 width: 100%;
@@ -1733,6 +1767,12 @@ $ResultGes = $mysqli->query("SELECT * FROM calidad.gestiones ORDER BY NomGestion
 
             .actions-box { flex-wrap: wrap; }
             .btn-nav { flex: 1 1 0; min-width: 40px; }
+        }
+        /* Desactivar sticky cuando un modal está abierto para evitar saltos */
+        body.modal-open .tableFixHead thead th 
+        {
+            position: static !important;
+            top: auto !important;
         }
     </style>
 
@@ -1773,6 +1813,7 @@ $ResultGes = $mysqli->query("SELECT * FROM calidad.gestiones ORDER BY NomGestion
             $(window).on('resize', AjustarAlturaMenu);
             $(window).on('load', AjustarAlturaMenu);
 
+            /* Recalcular al abrir/cerrar el menú colapsado en móvil */
             $('.navbar-collapse').on('shown.bs.collapse hidden.bs.collapse', AjustarAlturaMenu);
 
             var navMenu = document.querySelector('.navbar-fixed-top');
@@ -1898,6 +1939,7 @@ $ResultGes = $mysqli->query("SELECT * FROM calidad.gestiones ORDER BY NomGestion
             }
         }
 
+        /* ---------- Descripción completa en modal (solo móvil) ---------- */
         function EsVistaMovil() {
             return window.matchMedia && window.matchMedia('(max-width: 767px)').matches;
         }
@@ -1909,10 +1951,11 @@ $ResultGes = $mysqli->query("SELECT * FROM calidad.gestiones ORDER BY NomGestion
             $('#ModalDescripcionNoConformidad').modal('show');
         }
 
+        /* Muestra "Ver descripción completa" solo cuando el texto supera las 3 líneas */
         function AjustarHintsDescripcion() {
             if (!EsVistaMovil()) { return; }
             $('.desc-cell').each(function () {
-                var $txt  = $(this).find('.desc-text');
+                var $txt = $(this).find('.desc-text');
                 var $hint = $(this).find('.desc-hint');
                 if (!$txt.length || !$hint.length) { return; }
                 $hint.css('display', ($txt[0].scrollHeight - $txt[0].clientHeight > 2) ? '' : 'none');
@@ -1923,6 +1966,7 @@ $ResultGes = $mysqli->query("SELECT * FROM calidad.gestiones ORDER BY NomGestion
             AjustarHintsDescripcion();
         });
 
+        /* Marca en azul la fila que se está presionando/leyendo */
         $(document).on('touchstart mousedown', '#TBodyNoConformidad tr', function () {
             if (!EsVistaMovil()) { return; }
             var $tr = $(this);
@@ -1931,6 +1975,7 @@ $ResultGes = $mysqli->query("SELECT * FROM calidad.gestiones ORDER BY NomGestion
             $tr.addClass('fila-seleccionada');
         });
 
+        /* Al tocar la tarjeta (excepto acciones/enlaces) muestra la descripción completa */
         $(document).on('click', '#TBodyNoConformidad tr', function (e) {
             if (!EsVistaMovil()) { return; }
             var $tr = $(this);
@@ -1951,61 +1996,8 @@ $ResultGes = $mysqli->query("SELECT * FROM calidad.gestiones ORDER BY NomGestion
         function MostrarDivConsultaNoConformidad(mNumeroNC) {
             $("#ModalConsultaNoConformidadBody").load(
                 "noconformidadesD.php?TipoModificar=<?php echo md5('AjaxMostrarNoConformidad' . date('d')); ?>&NumeroNC=" + mNumeroNC,
-                function () { $("#ModalConsultaNoConformidad").modal('show'); }
+                $("#ModalConsultaNoConformidad").modal('show')
             );
-        }
-
-        /* --------------------------------------------------------------------
-           CambioGestión → Procesos (Select nativo, sin Select2)
-           -------------------------------------------------------------------- */
-        function CambioGestionProceso(mProceso) {
-            if (typeof mProceso === 'undefined') {
-                mProceso = '';
-            }
-
-            var sel = document.getElementById('Proceso');
-            var mCodGestion = document.getElementById('CodGestion').value;
-
-            sel.length = 1;
-            sel.value = '';
-
-            if (!mCodGestion) {
-                return;
-            }
-
-            $.ajax({
-                type: "GET",
-                url: 'noconformidadesD.php',
-                dataType: "json",
-                cache: false,
-                data: {
-                    TipoModificar: '<?php echo md5('JorCambioGestionProceso' . date('d')); ?>',
-                    CodGestion: mCodGestion
-                }
-            }).done(function (r) {
-                if (r.status !== 'success') {
-                    MostrarDatoObser(r.message || "Se presentó un error");
-                    return;
-                }
-
-                for (var i = 0; i < r.procesos.length; i++) {
-                    var opt = document.createElement('option');
-                    opt.value = r.procesos[i].codigo;
-                    opt.textContent = r.procesos[i].nombre;
-                    sel.appendChild(opt);
-                }
-
-                if (mProceso) {
-                    for (var j = 0; j < sel.options.length; j++) {
-                        if (sel.options[j].value === mProceso) {
-                            sel.selectedIndex = j;
-                            break;
-                        }
-                    }
-                }
-            }).fail(function () {
-                MostrarDatoObser("Error al cargar los procesos.");
-            });
         }
 
         function MostrarDivEditarNoConformidad(mNumeroNC) {
@@ -2017,11 +2009,6 @@ $ResultGes = $mysqli->query("SELECT * FROM calidad.gestiones ORDER BY NomGestion
             if (mNumeroNC == 'Nuevo') {
                 document.getElementById('Responsable').value = '<?php echo $_SESSION['NomUsuario']; ?>';
                 document.getElementById('FApertura').value = '<?php echo date('d/m/Y'); ?>';
-                document.getElementById('FileNoConformidad').dataset.yacargado = 0;
-
-                $('#DivDetectadaEnOtra, #DivRequiereAC, #DivNumeroNCAccionCorrectiva').hide();
-                document.getElementById('Proceso').length = 1;
-
                 $("#ModalEditarNoConformidad").modal('show');
             } else {
                 $.ajax({
@@ -2325,6 +2312,51 @@ $ResultGes = $mysqli->query("SELECT * FROM calidad.gestiones ORDER BY NomGestion
             }
         }
 
+        /* ---------- CambioGestión → Procesos (JSON) ---------- */
+        let ultimaPeticionProceso = 0;
+        let procesoPendiente = '';
+
+        function CambioGestionProceso(mProceso) {
+            if (typeof mProceso === 'undefined') mProceso = '';
+
+            const sel = document.getElementById('Proceso');
+            const mCodGestion = document.getElementById('CodGestion').value;
+            if (mProceso) procesoPendiente = mProceso;
+            const seleccionado = procesoPendiente || sel.value;
+            const id = ++ultimaPeticionProceso;
+
+            sel.length = 1;
+            if (!mCodGestion) {
+                procesoPendiente = '';
+                $('#Proceso').trigger('change');
+                return;
+            }
+
+            $.ajax({
+                type: "GET",
+                url: 'noconformidadesD.php',
+                dataType: "json",
+                cache: false,
+                data: {
+                    TipoModificar: '<?php echo md5('JorCambioGestionProceso' . date('d')); ?>',
+                    CodGestion: mCodGestion
+                }
+            }).done(function (r) {
+                if (id !== ultimaPeticionProceso) return;
+                if (r.status !== 'success') {
+                    MostrarDatoObser(r.message || "Se presentó un error");
+                    return;
+                }
+                sel.length = 1;
+                r.procesos.forEach(p => sel.add(new Option(p.nombre, p.codigo)));
+                if (seleccionado && Array.from(sel.options).some(o => o.value === seleccionado)) {
+                    sel.value = seleccionado;
+                }
+                procesoPendiente = '';
+                $('#Proceso').trigger('change');
+            });
+        }
+
         function CambioTipo() {
             mCodTipo = document.getElementById('Tipo').value;
             mRequiereAC = document.getElementById('RequiereAC').value;
@@ -2579,6 +2611,7 @@ $ResultGes = $mysqli->query("SELECT * FROM calidad.gestiones ORDER BY NomGestion
 
         $Ordenacioncita = ($_GET['Ordencito'] == 1) ? " ORDER BY NC.NumeroNC DESC" : " ORDER BY NC.FApertura DESC";
 
+        /* Constructor de URLs para el paginado, conservando todos los filtros actuales */
         $UrlPagina = function ($n) {
             $p = $_GET;
             $p['Filtrar'] = 1;
@@ -2590,6 +2623,7 @@ $ResultGes = $mysqli->query("SELECT * FROM calidad.gestiones ORDER BY NomGestion
                   JOIN calidad.noconformidades NC ON P.CodGestion = NC.CodGestion AND CONCAT(P.Colegio, P.CodProceso) = NC.Proceso
                   LEFT JOIN recursos.emplea E ON NC.Responsable = E.Nit_CCE " . $Filtrico;
 
+        /* Paginado */
         $regPorPagina = 20;
         $paginaActual = isset($_GET['pagina']) ? (int)$_GET['pagina'] : 1;
         if ($paginaActual < 1) { $paginaActual = 1; }
@@ -2714,13 +2748,13 @@ $ResultGes = $mysqli->query("SELECT * FROM calidad.gestiones ORDER BY NomGestion
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="ModalConsultaNoConformidadTitle"><i class="bi bi-eye"></i> Consulta Registro de No Conformidad</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
             </div>
             <div class="modal-body row">
                 <div class="col-sm-12" id="ModalConsultaNoConformidadBody">...</div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-danger" id="BotCancelarModal" data-bs-dismiss="modal"><i class="bi bi-x-lg"></i> Cerrar</button>
+                <button type="button" class="btn btn-danger" id="BotCancelarModal" data-dismiss="modal"><i class="bi bi-x-lg"></i> Cerrar</button>
             </div>
         </div>
     </div>
@@ -2732,13 +2766,13 @@ $ResultGes = $mysqli->query("SELECT * FROM calidad.gestiones ORDER BY NomGestion
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title"><i class="bi bi-file-text"></i> Descripción</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Cerrar"><span aria-hidden="true">&times;</span></button>
             </div>
             <div class="modal-body">
                 <div id="ModalDescripcionNoConformidadBody" class="desc-modal-text"></div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-danger" data-bs-dismiss="modal"><i class="bi bi-x-lg"></i> Cerrar</button>
+                <button type="button" class="btn btn-danger" data-dismiss="modal"><i class="bi bi-x-lg"></i> Cerrar</button>
             </div>
         </div>
     </div>
@@ -2750,7 +2784,7 @@ $ResultGes = $mysqli->query("SELECT * FROM calidad.gestiones ORDER BY NomGestion
         <div class="modal-content">
             <div class="modal-header">
                 <h3 class="modal-title col-sm-11" id="ModalEditarNoConformidadTitle"><i class="bi bi-pencil-square"></i> Editar / Crear No Conformidad</h3>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
             </div>
             <div class="modal-body row" id="DivBodyNoConformidad">
                 <form method="post" enctype="multipart/form-data" class="form_validar" name="FrmNoConformidad" id="FrmNoConformidad" autocomplete="off">
@@ -2794,15 +2828,12 @@ $ResultGes = $mysqli->query("SELECT * FROM calidad.gestiones ORDER BY NomGestion
 
                             <div class="form-group">
                                 <label for="Proceso">Proceso en donde se detecta</label>
-                                <select name="Proceso" class="form-control" id="Proceso">
-                                    <option value="" selected>...</option>
-                                </select>
+                                <select name="Proceso" class="form-control" id="Proceso"><option value="" selected>...</option></select>
                             </div>
 
                             <div class="form-group">
                                 <label for="FApertura">Fecha de apertura</label>
                                 <input type="text" name="FApertura" id="FApertura" class="form-control" placeholder="dd/mm/aaaa" onChange="ValidarFecha(this)" onBlur="ValidarFecha(this)">
-                                <small class="date-hint">Formato: dd/mm/aaaa</small>
                             </div>
 
                             <div class="nc-row">
@@ -2873,7 +2904,6 @@ $ResultGes = $mysqli->query("SELECT * FROM calidad.gestiones ORDER BY NomGestion
                             <div class="form-group">
                                 <label for="FRevision">Fecha acordada para la revisión</label>
                                 <input type="text" name="FRevision" id="FRevision" class="form-control" placeholder="dd/mm/aaaa" onChange="ValidarFecha(this)" onBlur="ValidarFecha(this)">
-                                <small class="date-hint">Formato: dd/mm/aaaa</small>
                             </div>
 
                             <div class="form-group">
@@ -2893,7 +2923,7 @@ $ResultGes = $mysqli->query("SELECT * FROM calidad.gestiones ORDER BY NomGestion
                 </form>
             </div>
             <div class="modal-footer" id="BotsNoConformidad">
-                <button type="button" class="btn btn-danger" data-bs-dismiss="modal"><i class="bi bi-x-lg"></i> Cerrar</button>
+                <button type="button" class="btn btn-danger" data-dismiss="modal"><i class="bi bi-x-lg"></i> Cerrar</button>
                 <button type="button" class="btn btn-success" onClick="GrabarNoConformidad();"><i class="bi bi-check2"></i> Aceptar</button>
             </div>
         </div>
@@ -2906,7 +2936,7 @@ $ResultGes = $mysqli->query("SELECT * FROM calidad.gestiones ORDER BY NomGestion
         <div class="modal-content">
             <div class="modal-header">
                 <h4 class="modal-title col-sm-11" id="ModalSeguimientosTitle"><i class="bi bi-list-check"></i> Editar Seguimientos No Conformidad</h4>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
             </div>
             <div class="modal-body row" id="DivBodySeguimientos">
                 <form method="post" enctype="multipart/form-data" class="form_validar" name="FrmSeguimientos" id="FrmSeguimientos" autocomplete="off">
@@ -2919,7 +2949,7 @@ $ResultGes = $mysqli->query("SELECT * FROM calidad.gestiones ORDER BY NomGestion
             <div class="modal-footer" id="BotsSeguimientos">
                 <button type="button" class="btn btn-secondary" onClick="AgregarSeguimiento();"><i class="bi bi-plus-lg"></i> Otro Seguimiento</button>
                 <div style="flex:1"></div>
-                <button type="button" class="btn btn-danger" data-bs-dismiss="modal"><i class="bi bi-x-lg"></i> Cerrar</button>
+                <button type="button" class="btn btn-danger" data-dismiss="modal"><i class="bi bi-x-lg"></i> Cerrar</button>
                 <button type="button" class="btn btn-success" onClick="GrabarSeguimientos();"><i class="bi bi-check2"></i> Aceptar</button>
             </div>
         </div>
@@ -2932,7 +2962,7 @@ $ResultGes = $mysqli->query("SELECT * FROM calidad.gestiones ORDER BY NomGestion
         <div class="modal-content">
             <div class="modal-header">
                 <h3 class="modal-title col-sm-11" id="ModalCerrarNoConformidadTitle"><i class="bi bi-check2-circle"></i> Datos del Cierre del Registro</h3>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
             </div>
             <div class="modal-body row" id="DivBodyCerrarNoConformidad">
                 <form method="post" enctype="multipart/form-data" class="form_validar" name="FrmCerrarNoConformidad" id="FrmCerrarNoConformidad" autocomplete="off">
@@ -2955,7 +2985,6 @@ $ResultGes = $mysqli->query("SELECT * FROM calidad.gestiones ORDER BY NomGestion
                     <div class="col-sm-2 form-group">
                         <label for="FCierre">Fecha del Cierre</label>
                         <input type="text" name="FCierre" id="FCierre" class="form-control" placeholder="dd/mm/aaaa" onChange="ValidarFecha(this)" onBlur="ValidarFecha(this)">
-                        <small class="date-hint">Formato: dd/mm/aaaa</small>
                     </div>
                     <div class="col-sm-4 form-group">
                         <label for="RCierre">Responsable del Cierre</label>
@@ -2965,7 +2994,7 @@ $ResultGes = $mysqli->query("SELECT * FROM calidad.gestiones ORDER BY NomGestion
                 </form>
             </div>
             <div class="modal-footer" id="BotsCerrarNoConformidad">
-                <button type="button" class="btn btn-danger" data-bs-dismiss="modal"><i class="bi bi-x-lg"></i> Cerrar</button>
+                <button type="button" class="btn btn-danger" data-dismiss="modal"><i class="bi bi-x-lg"></i> Cerrar</button>
                 <button type="button" class="btn btn-success" onClick="GrabarCerrarNoConformidad();"><i class="bi bi-check2"></i> Aceptar</button>
             </div>
         </div>
@@ -2978,7 +3007,7 @@ $ResultGes = $mysqli->query("SELECT * FROM calidad.gestiones ORDER BY NomGestion
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="ModalReportesTitle"><i class="bi bi-file-earmark-excel"></i> Consulta Reportes</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
             </div>
             <div class="modal-body row" id="ModalReportesBody">
                 <form method="post" enctype="multipart/form-data" class="form_validar" name="FrmReportes" id="FrmReportes" autocomplete="off" target="_blank" style="width:100%">
@@ -3020,7 +3049,7 @@ $ResultGes = $mysqli->query("SELECT * FROM calidad.gestiones ORDER BY NomGestion
                 </form>
             </div>
             <div class="modal-footer" id="BotsReportes">
-                <button type="button" class="btn btn-danger" data-bs-dismiss="modal"><i class="bi bi-x-lg"></i> Cerrar</button>
+                <button type="button" class="btn btn-danger" data-dismiss="modal"><i class="bi bi-x-lg"></i> Cerrar</button>
                 <button type="button" class="btn btn-success" id="BtnGenerarReporte" onClick="EnviarReportes();"><i class="bi bi-file-earmark-arrow-down"></i> Generar</button>
             </div>
         </div>
