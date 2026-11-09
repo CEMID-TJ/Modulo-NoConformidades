@@ -16,60 +16,22 @@ $PuedeAdministrar = in_array($_SESSION['Usuario'], array(
 
 $PuedeReversar = in_array($_SESSION['Usuario'], array(
     (InList($_SESSION["Perfil"], "ADMIN") ? $_SESSION['Usuario'] : "98381246"),
-    '1014305622',     // Laura Valentina
-    '1073696610',     // Jenniffer Bello
-    '1233909122',     // Eduardo León
-    '1022928448'      // JABIER BARRERA
+    '1014305622',
+    '1073696610',
+    '1233909122',
+    '1022928448'
 ));
 
 $PuedeGeneral = in_array($_SESSION['Usuario'], array(
     (InList($_SESSION["Perfil"], "ADMIN") ? $_SESSION['Usuario'] : "98381246"),
-    '39665007',       // MarthaCV
-    '79404413',       // Alvaro Parra
-    '8730314',        // JavierM
-    '37829191',       // Nelcy Jerez
-    '40025213',       // Consuelo Ramirez
-    '41405252',       // Luz M
-    '79879905',       // CarlosL
-    '39668167',       // Marcela Piñeros
-    '1072665948',     // Jessica Agudelo
-    '52903643',       // CASALLAS DEICY
-    '1032380671',     // ARDILA GISSED
-    '52378375',       // CASTAÑEDA LINA
-    '52226604',       // PARROQUIANO MARYSOL
-    '80241390',       // ARIAS FABIO
-    '52849113',       // PULIDO PEREZ CATERYN
-    '1024471606',     // JUDY ANDREA RUEDA GOMEZ
-    '53048628',       // FLOREZ CASTAÑEDA DIANA CAROLINA
-    '52382262',       // SABOGAL CORTES FLOR XIMENA
-    '52159469',       // CASTILLO MARTINEZ IVONNE ASTRID
-    '53067789',       // RODRIGUEZ MUÑOZ VIVIANA EMILCE
-    '1024509359',     // SEMA CASTIBLANCO MARIA TERESA
-    '32764527',       // OCHOA BOHORQUEZ SANDRA YODANY
-    '63347978',       // RAMIREZ TOLOZA CLARA EUGENIA
-    '63489430',       // BAUTISTA GONZALEZ LILIA CELINA
-    '1098682989',     // BRAVO PACHECO YANETH NATALIA
-    '37556707',       // RAMIREZ CARRILLO DEISY
-    '1010171514',     // CUBILLOS CABRERA PAUL BRAYAN
-    '1023861416',     // ZAMBRANO SABOGAL PEDRO PABLO
-    '79844012',       // ROMERO TIJO NESTOR RAUL
-    '52190948',       // QUIÑONES DIAZ AIDA YANETH
-    '1024539393',     // PITA FUQUENE LEIDY JOHANA
-    '1073152711',     // TELLEZ LOZANO SANDRA PATRICIA
-    '1023013296',     // CUBIDES MORENO NATHALIA
-    '1014220582',     // SERENY JIMENEZ JULIET FERNANDA
-    '1015428198',     // CONEO JARABA KARINA KAROLAY
-    '1030610691',     // GONZALEZ DELGADO YESICA PAOLA
-    '1022340598',     // LONDOÑO MICHAEL
-    '1022415485',     // GAONA ARANGO LAURA ROCIO
-    '52803785',       // CUELLAR PIZA ERIKA MILENA
-    '37547875',       // CABALLERO GRATZ MARYLUZ
-    '37752414',       // CASADIEGO CUAO ADELINA ESTER
-    '52233576',       // PIZA CAMACHO SANDRA MILENA
-    '1019050390',     // GUTIERREZ RODRIGUEZ YINETH ROCIO
-    '1073696610',     // JENIFFER BELLO MAYORGA
-    '1014305622',     // LAURA GONZÁLEZ
-    '3276248'         // GustavoG
+    '39665007', '79404413', '8730314', '37829191', '40025213', '41405252',
+    '79879905', '39668167', '1072665948', '52903643', '1032380671', '52378375',
+    '52226604', '80241390', '52849113', '1024471606', '53048628', '52382262',
+    '52159469', '53067789', '1024509359', '32764527', '63347978', '63489430',
+    '1098682989', '37556707', '1010171514', '1023861416', '79844012', '52190948',
+    '1024539393', '1073152711', '1023013296', '1014220582', '1015428198',
+    '1030610691', '1022340598', '1022415485', '52803785', '37547875', '37752414',
+    '52233576', '1019050390', '1073696610', '1014305622', '3276248'
 ));
 
 $mTipoRegistro = array(
@@ -85,7 +47,7 @@ include("../conexion_servidor.php");
 
 
 /* ============================================================================
-   [PHP - AJAX] Consulta detallada (HTML)
+   [PHP - AJAX] Consulta detallada de una No Conformidad (HTML)
    ============================================================================ */
 if ($_GET['TipoModificar'] == md5('AjaxMostrarNoConformidad' . date('d')) and $_GET['NumeroNC']) {
 
@@ -744,7 +706,6 @@ $ResultGes = $mysqli->query("SELECT * FROM calidad.gestiones ORDER BY NomGestion
     <script src="../librerias/jquery/jquery-1.10.2.js"></script>
     <script src="../librerias/jquery/jquery-ui.js"></script>
 
-    <!-- Bootstrap actualizado a la última versión estable 5.3.8 -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
@@ -1290,7 +1251,7 @@ $ResultGes = $mysqli->query("SELECT * FROM calidad.gestiones ORDER BY NomGestion
             overflow-y: auto;
         }
 
-        /* ---------- Adjuntar archivo (PDF en rojo) ---------- */
+        /* ---------- Adjuntar archivo (icono PDF en rojo directo) ---------- */
         .btn-file.modern-file-input {
             display: flex !important;
             align-items: center;
@@ -1316,18 +1277,12 @@ $ResultGes = $mysqli->query("SELECT * FROM calidad.gestiones ORDER BY NomGestion
             color: var(--danger) !important;
         }
 
-        /* Forzar iconos PDF a rojo (solución al problema del icono azul) */
-        .btn-file.modern-file-input i,
-        .btn-file.modern-file-input i.bi,
-        .btn-file.modern-file-input i.bi-file-earmark-pdf,
-        .btn-file.modern-file-input i.bi-file-earmark-check {
+        /* Icono: SIEMPRE rojo por defecto */
+        .btn-file.modern-file-input i {
             font-size: 20px;
             color: var(--danger) !important;
         }
-        .btn-file.modern-file-input:hover i,
-        .btn-file.modern-file-input:hover i.bi,
-        .btn-file.modern-file-input:hover i.bi-file-earmark-pdf,
-        .btn-file.modern-file-input:hover i.bi-file-earmark-check {
+        .btn-file.modern-file-input:hover i {
             color: var(--danger-hover) !important;
         }
 
@@ -1336,10 +1291,7 @@ $ResultGes = $mysqli->query("SELECT * FROM calidad.gestiones ORDER BY NomGestion
             background: var(--success-bg) !important;
             color: var(--success-hover) !important;
         }
-        .btn-file.modern-file-input.archivo-cargado i,
-        .btn-file.modern-file-input.archivo-cargado i.bi,
-        .btn-file.modern-file-input.archivo-cargado i.bi-file-earmark-pdf,
-        .btn-file.modern-file-input.archivo-cargado i.bi-file-earmark-check {
+        .btn-file.modern-file-input.archivo-cargado i {
             color: var(--success-hover) !important;
         }
 
@@ -1470,19 +1422,16 @@ $ResultGes = $mysqli->query("SELECT * FROM calidad.gestiones ORDER BY NomGestion
            RESPONSIVE
            ========================================================== */
 
-        /* Tablet */
         @media (max-width: 991px) {
             .container { width: 100%; padding: 0 12px; }
             .btn-nav { width: 34px; height: 34px; }
         }
 
-        /* Móvil */
         @media (max-width: 767px) {
             body { font-size: 13px; }
 
             .container { width: 100%; padding: 0 8px; }
 
-            /* Navbar compacto */
             .navbar-default {
                 padding: 6px 10px;
                 min-height: 52px;
@@ -1505,7 +1454,6 @@ $ResultGes = $mysqli->query("SELECT * FROM calidad.gestiones ORDER BY NomGestion
                 padding: 7px 9px;
             }
 
-            /* Menú desplegado: filtros en 2 columnas */
             .navbar .collapse {
                 border-top: 1px solid var(--border);
                 margin-top: 6px;
@@ -1532,7 +1480,6 @@ $ResultGes = $mysqli->query("SELECT * FROM calidad.gestiones ORDER BY NomGestion
                 padding: 5px 8px;
             }
 
-            /* Caja de acciones: ancho completo, botones táctiles */
             .actions-box {
                 width: 100%;
                 height: auto;
@@ -1548,7 +1495,6 @@ $ResultGes = $mysqli->query("SELECT * FROM calidad.gestiones ORDER BY NomGestion
                 font-size: 18px;
             }
 
-            /* ================== TABLA COMO CARDS ================== */
             .tableFixHead.table-responsive {
                 border: none;
                 border-radius: 0;
@@ -1610,7 +1556,6 @@ $ResultGes = $mysqli->query("SELECT * FROM calidad.gestiones ORDER BY NomGestion
                 margin-top: 6px;
             }
 
-            /* Descripción resumida */
             .tableFixHead tbody td.desc-cell { cursor: pointer; }
             .tableFixHead tbody td.desc-cell .desc-text {
                 display: -webkit-box;
@@ -1631,13 +1576,11 @@ $ResultGes = $mysqli->query("SELECT * FROM calidad.gestiones ORDER BY NomGestion
             }
             .tableFixHead tbody td.desc-cell .desc-hint::after { content: 'Ver descripción completa ›'; }
 
-            /* Fila seleccionada */
             .tableFixHead tbody tr.fila-seleccionada {
                 border-color: var(--primary) !important;
                 box-shadow: 0 0 0 2px rgba(37, 99, 235, .22), var(--shadow-sm) !important;
             }
 
-            /* Paginación en móvil */
             .nc-pagination {
                 padding: 10px 12px;
                 flex-direction: column;
@@ -1648,7 +1591,6 @@ $ResultGes = $mysqli->query("SELECT * FROM calidad.gestiones ORDER BY NomGestion
             .nc-pagination-controls { justify-content: center; }
             .page-btn { min-width: 36px; height: 36px; }
 
-            /* Acciones dentro de la card */
             .acciones-cell {
                 justify-content: flex-start;
                 gap: 6px;
@@ -1667,7 +1609,6 @@ $ResultGes = $mysqli->query("SELECT * FROM calidad.gestiones ORDER BY NomGestion
                 margin-right: 4px;
             }
 
-            /* Modales full-width */
             .modal-dialog {
                 margin: 8px auto !important;
                 width: calc(100% - 16px) !important;
@@ -1693,7 +1634,6 @@ $ResultGes = $mysqli->query("SELECT * FROM calidad.gestiones ORDER BY NomGestion
                 max-height: calc(100vh - 140px);
             }
 
-            /* Formulario NC */
             #FrmNoConformidad { gap: 10px; }
             #FrmNoConformidad > .col-sm-4 {
                 flex: 1 1 100%;
@@ -1704,7 +1644,6 @@ $ResultGes = $mysqli->query("SELECT * FROM calidad.gestiones ORDER BY NomGestion
 
             .nc-box { padding: 14px 12px; gap: 10px; }
 
-            /* Seguimientos */
             .nc-section { padding: 12px 10px !important; }
             .seguimiento-header {
                 margin: 0 0 8px 0;
@@ -1723,13 +1662,11 @@ $ResultGes = $mysqli->query("SELECT * FROM calidad.gestiones ORDER BY NomGestion
                 height: 42px;
             }
 
-            /* Botón archivo */
             .btn-file.modern-file-input {
                 padding: 12px 14px !important;
                 font-size: 12px;
             }
 
-            /* Alertas */
             .myAlert-top {
                 min-width: auto;
                 width: 92%;
@@ -1738,18 +1675,14 @@ $ResultGes = $mysqli->query("SELECT * FROM calidad.gestiones ORDER BY NomGestion
                 top: 70px;
             }
 
-            /* Textareas */
             textarea.form-control { min-height: 70px; }
 
-            /* Paneles de consulta */
             .nc-field { padding: 10px 12px !important; }
             .nc-value { font-size: 13px; }
 
-            /* Etiqueta de basurero */
             .d-none-mobile { display: none !important; }
         }
 
-        /* Móviles pequeños */
         @media (max-width: 480px) {
             .navbar .collapse form > .col-sm-10 > .form-group {
                 width: 100%;
@@ -1943,7 +1876,6 @@ $ResultGes = $mysqli->query("SELECT * FROM calidad.gestiones ORDER BY NomGestion
             }
         }
 
-        /* ---------- Descripción resumida → modal (solo móvil) ---------- */
         function EsVistaMovil() {
             return window.matchMedia && window.matchMedia('(max-width: 767px)').matches;
         }
@@ -2001,6 +1933,59 @@ $ResultGes = $mysqli->query("SELECT * FROM calidad.gestiones ORDER BY NomGestion
             );
         }
 
+        /* --------------------------------------------------------------------
+           CambioGestión → Procesos (Select nativo, sin Select2)
+           -------------------------------------------------------------------- */
+        function CambioGestionProceso(mProceso) {
+            if (typeof mProceso === 'undefined') {
+                mProceso = '';
+            }
+
+            var sel = document.getElementById('Proceso');
+            var mCodGestion = document.getElementById('CodGestion').value;
+
+            sel.length = 1;
+            sel.value = '';
+
+            if (!mCodGestion) {
+                return;
+            }
+
+            $.ajax({
+                type: "GET",
+                url: 'noconformidadesD.php',
+                dataType: "json",
+                cache: false,
+                data: {
+                    TipoModificar: '<?php echo md5('JorCambioGestionProceso' . date('d')); ?>',
+                    CodGestion: mCodGestion
+                }
+            }).done(function (r) {
+                if (r.status !== 'success') {
+                    MostrarDatoObser(r.message || "Se presentó un error");
+                    return;
+                }
+
+                for (var i = 0; i < r.procesos.length; i++) {
+                    var opt = document.createElement('option');
+                    opt.value = r.procesos[i].codigo;
+                    opt.textContent = r.procesos[i].nombre;
+                    sel.appendChild(opt);
+                }
+
+                if (mProceso) {
+                    for (var j = 0; j < sel.options.length; j++) {
+                        if (sel.options[j].value === mProceso) {
+                            sel.selectedIndex = j;
+                            break;
+                        }
+                    }
+                }
+            }).fail(function () {
+                MostrarDatoObser("Error al cargar los procesos.");
+            });
+        }
+
         function MostrarDivEditarNoConformidad(mNumeroNC) {
             document.FrmNoConformidad.reset();
             document.getElementById('NumeroNC').value = mNumeroNC;
@@ -2028,7 +2013,7 @@ $ResultGes = $mysqli->query("SELECT * FROM calidad.gestiones ORDER BY NomGestion
                     cache: false
                 }).done(function (data) {
                     if (data.status === "Error") {
-                        MostrarDatoObser("Se presentó un error", true);
+                        MostrarDatoObser("Se presentó un error");
                         return false;
                     }
 
@@ -2316,62 +2301,6 @@ $ResultGes = $mysqli->query("SELECT * FROM calidad.gestiones ORDER BY NomGestion
                 MostrarDatoObser('<i class="bi bi-exclamation-triangle"></i> Complete los campos resaltados en rojo antes de continuar.');
                 ScrollAlPrimerError('#FrmCerrarNoConformidad');
             }
-        }
-
-        /* --------------------------------------------------------------------
-           CambioGestión → Procesos
-           - Se destruye y re-inicializa el select nativo para que el <select>
-             reciba los nuevos <option> y el desplegable muestre los datos.
-           -------------------------------------------------------------------- */
-        function CambioGestionProceso(mProceso) {
-            if (typeof mProceso === 'undefined') mProceso = '';
-
-            var sel = document.getElementById('Proceso');
-            var mCodGestion = document.getElementById('CodGestion').value;
-
-            // Limpiar el select nativo
-            sel.length = 1;
-            sel.value = '';
-
-            if (!mCodGestion) {
-                return;
-            }
-
-            $.ajax({
-                type: "GET",
-                url: 'noconformidadesD.php',
-                dataType: "json",
-                cache: false,
-                data: {
-                    TipoModificar: '<?php echo md5('JorCambioGestionProceso' . date('d')); ?>',
-                    CodGestion: mCodGestion
-                }
-            }).done(function (r) {
-                if (r.status !== 'success') {
-                    MostrarDatoObser(r.message || "Se presentó un error", true);
-                    return;
-                }
-
-                // Insertar opciones como Option nativo
-                for (var i = 0; i < r.procesos.length; i++) {
-                    var opt = document.createElement('option');
-                    opt.value = r.procesos[i].codigo;
-                    opt.textContent = r.procesos[i].nombre;
-                    sel.appendChild(opt);
-                }
-
-                // Seleccionar el proceso si existe
-                if (mProceso) {
-                    for (var j = 0; j < sel.options.length; j++) {
-                        if (sel.options[j].value === mProceso) {
-                            sel.selectedIndex = j;
-                            break;
-                        }
-                    }
-                }
-            }).fail(function () {
-                MostrarDatoObser("Error al cargar los procesos.", true);
-            });
         }
 
         function CambioTipo() {
