@@ -720,15 +720,15 @@ if ($_GET['Filtrar'] == 1) {
     }
 
     // Filtro por número específico
-    if ($_GET['FiltroNumeroNC']) {
-        $Filtrico .= " AND FIND_IN_SET(NC.NumeroNC, '" . $_GET['FiltroNumeroNC'] . "')";
+    if (!empty($_GET['FiltroNumeroNC'])) {
+        $Filtrico .= " AND FIND_IN_SET(NC.NumeroNC, '" . $mysqli->real_escape_string($_GET['FiltroNumeroNC']) . "')";
     } else {
         // Filtro por Gestión
         if (!empty($_GET['FiltroCodGestion'])) {
             $Filtrico .= " AND NC.CodGestion = '" . $mysqli->real_escape_string($_GET['FiltroCodGestion']) . "'";
         }
-        if ($_GET['FiltroTipo']) {
-            $Filtrico .= " AND NC.Tipo = '" . $_GET['FiltroTipo'] . "'";
+        if (!empty($_GET['FiltroTipo'])) {
+            $Filtrico .= " AND NC.Tipo = '" . $mysqli->real_escape_string($_GET['FiltroTipo']) . "'";
         }
         if ($_GET['FiltroTipoAcciones'] == 1) {
             $Filtrico .= " AND (NC.Accion = '' OR NC.Accion IS NULL)";
@@ -739,8 +739,8 @@ if ($_GET['Filtrar'] == 1) {
         } elseif ($_GET['FiltroTipoAcciones'] == 4) {
             $Filtrico .= " AND (NC.FCierre <> '' AND NC.FCierre IS NOT NULL)";
         }
-        if ($_GET['FiltroProceso']) {
-            $Filtrico .= " AND NC.Proceso = '" . $_GET['FiltroProceso'] . "'";
+        if (!empty($_GET['FiltroProceso'])) {
+            $Filtrico .= " AND NC.Proceso = '" . $mysqli->real_escape_string($_GET['FiltroProceso']) . "'";
         }
     }
 
@@ -797,6 +797,11 @@ if ($_GET['Filtrar'] == 1) {
     <script src="../librerias/bootstrap-3.3.7-dist/js/bootstrap.min.js"></script>
     <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
     <script src="../funciones.js"></script>
+
+    <!-- Select2 (Autocompletado predictivo al escribir) -->
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/i18n/es.js"></script>
 
     <style>
         /* ===== Variables y base ===== */
@@ -891,6 +896,48 @@ if ($_GET['Filtrar'] == 1) {
         }
         .btn-nav-primary { background: var(--primary) !important; border-color: var(--primary) !important; color: #fff !important; }
         .btn-nav-primary:hover { background: var(--primary-hover) !important; border-color: var(--primary-hover) !important; color: #fff !important; }
+
+        /* ===== Select2 Personalizado ===== */
+        .select2-container .select2-selection--single {
+            height: 38px !important;
+            border: 1.5px solid var(--border) !important;
+            border-radius: 8px !important;
+            background-color: #f7f9fc !important;
+            display: flex !important;
+            align-items: center;
+        }
+        .select2-container .select2-selection--single .select2-selection__rendered {
+            color: var(--text) !important;
+            font-size: 13px !important;
+            padding-left: 10px !important;
+            line-height: 36px !important;
+        }
+        .select2-container .select2-selection--single .select2-selection__arrow {
+            height: 36px !important;
+            right: 8px !important;
+        }
+        .select2-container--open .select2-selection--single {
+            border-color: var(--primary) !important;
+            background-color: #fff !important;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, .18) !important;
+        }
+        .select2-dropdown {
+            border: 1.5px solid var(--border) !important;
+            border-radius: 8px !important;
+            box-shadow: var(--shadow) !important;
+            font-size: 13px !important;
+            z-index: 9999999 !important;
+        }
+        .select2-results__option--highlighted[aria-selected] {
+            background-color: var(--primary) !important;
+            color: #fff !important;
+        }
+        .select2-search--dropdown .select2-search__field {
+            border: 1.5px solid var(--border) !important;
+            border-radius: 6px !important;
+            padding: 6px 10px !important;
+            font-size: 13px !important;
+        }
 
         /* ===== Formularios ===== */
         .form-control {
@@ -1170,7 +1217,6 @@ if ($_GET['Filtrar'] == 1) {
             .actions-box { width: 100%; height: auto; min-height: 52px; padding: 4px; gap: 4px; justify-content: center; box-sizing: border-box; }
             .btn-nav { width: 44px; height: 44px; font-size: 18px; }
 
-            /* Tabla como cards */
             .tableFixHead.table-responsive { border: none; border-radius: 0; box-shadow: none; background: transparent; margin-bottom: 10px; }
             .tableFixHead thead { display: none; }
             .tableFixHead table, .tableFixHead tbody, .tableFixHead tr, .tableFixHead td { display: block; width: 100%; }
@@ -1276,7 +1322,30 @@ if ($_GET['Filtrar'] == 1) {
 
             $("#FApertura, #FRevision, #FCierre").datepicker({ dateFormat: 'dd-mm-yy', showOn: 'focus' });
 
-            /* ===== Fix responsive: no ajustar la altura mientras el menú está abierto ===== */
+            // Inicializar Select2 en los selectores superiores (Búsqueda en tiempo real)
+            $('#FiltroCodGestion, #FiltroProceso, #FiltroTipo, #FiltroTipoAcciones, #Ordencito').select2({
+                language: 'es',
+                width: '100%',
+                placeholder: function(){
+                    return $(this).data('placeholder');
+                },
+                allowClear: false
+            });
+
+            // Inicializar Select2 en los selectores del modal de edición
+            $('#CodGestion, #Proceso, #Tipo, #DetectadaEn, #RequiereAC').select2({
+                language: 'es',
+                dropdownParent: $('#ModalEditarNoConformidad'),
+                width: '100%'
+            });
+
+            // Inicializar Select2 en el modal de reportes
+            $('#TipoReporte, #ReportProceso').select2({
+                language: 'es',
+                dropdownParent: $('#ModalReportes'),
+                width: '100%'
+            });
+
             function AjustarAlturaMenu() {
                 var nav = document.querySelector('.navbar-fixed-top');
                 if (!nav) return;
@@ -1341,21 +1410,8 @@ if ($_GET['Filtrar'] == 1) {
             setTimeout(function () { $("#DatoObser").hide(); }, 3000);
         }
 
+        // Búsqueda limpia: permite buscar sin obligar a llenar filtros
         function ValidarFiltros() {
-            var filtros = ['FiltroCodGestion', 'FiltroProceso', 'FiltroTipo', 'FiltroTipoAcciones', 'FiltroNumeroNC'];
-            var tieneFiltro = false;
-            for (var i = 0; i < filtros.length; i++) {
-                var el = document.getElementById(filtros[i]);
-                if (el && el.value && el.value.trim() !== '') { tieneFiltro = true; break; }
-            }
-            if (!tieneFiltro) {
-                MostrarDatoObser('<i class="bi bi-exclamation-triangle"></i> Debe seleccionar al menos un criterio de búsqueda.');
-                $('#FiltroCodGestion, #FiltroProceso, #FiltroTipo, #FiltroTipoAcciones, #FiltroNumeroNC').each(function () {
-                    $(this).addClass('alert-danger');
-                    setTimeout(function (el) { $(el).removeClass('alert-danger'); }, 1800, this);
-                });
-                return false;
-            }
             document.FrmFiltrar.submit();
         }
 
@@ -1427,6 +1483,7 @@ if ($_GET['Filtrar'] == 1) {
             if (mNumeroNC == 'Nuevo') {
                 document.getElementById('Responsable').value = '<?php echo $_SESSION['NomUsuario']; ?>';
                 document.getElementById('FApertura').value = '<?php echo date('d/m/Y'); ?>';
+                $('#CodGestion, #Proceso, #Tipo, #DetectadaEn, #RequiereAC').val('').trigger('change');
                 $("#ModalEditarNoConformidad").modal('show');
             } else {
                 $.ajax({
@@ -1435,19 +1492,23 @@ if ($_GET['Filtrar'] == 1) {
                     dataType: "json", cache: false
                 }).done(function (data) {
                     if (data.status === "Error") { MostrarDatoObser("Se presentó un error"); return false; }
-                    document.getElementById('CodGestion').value = data.CodGestion;
+                    $('#CodGestion').val(data.CodGestion).trigger('change');
                     CambioGestionProceso(data.Proceso);
                     document.getElementById('Responsable').value = data.NomResponsable;
-                    document.getElementById('Tipo').value = data.Tipo;
+                    $('#Tipo').val(data.Tipo).trigger('change');
                     document.getElementById('FApertura').value = data.FApertura;
-                    var detectadaEn = document.getElementById('DetectadaEn');
-                    detectadaEn.value = data.DetectadaEn;
-                    if (detectadaEn.selectedIndex <= 0 && data.DetectadaEn !== '') { detectadaEn.value = 'Otra'; }
-                    ValidarDetectadaEn(detectadaEn.value);
+                    
+                    var detectadaVal = data.DetectadaEn;
+                    if ($('#DetectadaEn option[value="' + detectadaVal + '"]').length === 0 && detectadaVal !== '') {
+                        detectadaVal = 'Otra';
+                    }
+                    $('#DetectadaEn').val(detectadaVal).trigger('change');
+                    ValidarDetectadaEn(detectadaVal);
+
                     document.getElementById('DetectadaEnOtra').value = data.DetectadaEnOtra || '';
                     document.getElementById('Descripcion').value = data.Descripcion || '';
                     document.getElementById('Correccion').value = data.Correccion || '';
-                    document.getElementById('RequiereAC').value = data.RequiereAC || '';
+                    $('#RequiereAC').val(data.RequiereAC).trigger('change');
                     CambioTipo();
                     document.getElementById('NumeroNCAccionCorrectiva').value = data.NumeroNCAccionCorrectiva || '';
                     document.getElementById('Causas').value = data.Causas || '';
@@ -1526,22 +1587,40 @@ if ($_GET['Filtrar'] == 1) {
 
         function AgregarSeguimiento() {
             mRegNew = parseInt(document.getElementById('CantSeguimientos').value, 10);
-            if (isNaN(mRegNew)) { mRegNew = 1; } else { mRegNew++; }
+            if (isNaN(mRegNew)) { 
+                mRegNew = 1; 
+            } else { 
+                mRegNew++; 
+            }
             document.getElementById('CantSeguimientos').value = mRegNew;
-            $('#DivSeguimiento1').clone().find("input,select,a,button,textarea,div,span").each(function () {
+
+            var $nuevoBloque = $('#DivSeguimiento1').clone();
+
+            $nuevoBloque.find("input,select,a,button,textarea,div,span").each(function () {
                 $(this).attr({
-                    'id': function (_, id) { return (id ? id.replace(1, mRegNew) : null); },
-                    'name': function (_, name) { return (name ? name.replace(1, mRegNew) : null); },
+                    'id': function (_, id) { return (id ? id.replace('1', mRegNew) : null); },
+                    'name': function (_, name) { return (name ? name.replace('1', mRegNew) : null); },
                     'checked': false
                 });
-                if ($(this).is('input,select,textarea')) { $(this).val(''); }
-            }).end().appendTo('#DivSeguimientos');
-            $('#SpanSeguimiento' + mRegNew).text('Seguimiento ' + mRegNew);
-            $('#DivSeguimientos > .nc-section:last').show();
-            $('#DivSeguimientos > .nc-section:last').attr("id", "DivSeguimiento" + mRegNew);
-            $("#Fecha" + mRegNew).datepicker({ dateFormat: 'dd-mm-yy', showOn: 'focus' });
-        }
+                if ($(this).is('input,select,textarea')) { 
+                    $(this).val(''); 
+                }
+            });
 
+            var $inputFecha = $nuevoBloque.find("input[id^='Fecha']");
+            $inputFecha.removeClass('hasDatepicker').removeData('datepicker').unbind();
+
+            $nuevoBloque.find('#SpanSeguimiento' + mRegNew).text('Seguimiento ' + mRegNew);
+            $nuevoBloque.attr("id", "DivSeguimiento" + mRegNew);
+            $nuevoBloque.show();
+
+            $nuevoBloque.appendTo('#DivSeguimientos');
+
+            $("#Fecha" + mRegNew).datepicker({ 
+            dateFormat: 'dd/mm/yy', 
+            showOn: 'focus' 
+            });
+        }
         function GrabarSeguimientos() {
             MostrarDatoObser('Procesando');
             mNumeroNCSeguimientos = document.getElementById('NumeroNCSeguimientos').value;
@@ -1632,7 +1711,7 @@ if ($_GET['Filtrar'] == 1) {
             const seleccionado = procesoPendiente || sel.value;
             const id = ++ultimaPeticionProceso;
             sel.length = 1;
-            if (!mCodGestion) { procesoPendiente = ''; $('#Proceso').trigger('change'); return; }
+            if (!mCodGestion) { procesoPendiente = ''; $('#Proceso').val('').trigger('change'); return; }
             $.ajax({
                 type: "GET", url: '<?php echo basename(__FILE__); ?>', dataType: "json", cache: false,
                 data: { TipoModificar: '<?php echo md5('JorCambioGestionProceso' . date('d')); ?>', CodGestion: mCodGestion }
@@ -1765,7 +1844,7 @@ if ($_GET['Filtrar'] == 1) {
                 <div class="col-sm-10 form-group" style="padding-top:6px">
                     <div class="col-sm-2 form-group">
                         <select name="FiltroCodGestion" class="form-control" id="FiltroCodGestion">
-                            <option value="" selected>Gestión</option>
+                            <option value="" selected>Gestión (Todas)</option>
                             <?php
                             mysqli_data_seek($ResultGes, 0);
                             for ($j = 1; $j <= $ResultGes->num_rows; $j++) {
@@ -1779,7 +1858,7 @@ if ($_GET['Filtrar'] == 1) {
                     </div>
                     <div class="col-sm-2 form-group">
                         <select name="FiltroProceso" class="form-control" id="FiltroProceso">
-                            <option value="" selected>cualquier proceso</option>
+                            <option value="" selected>Cualquier proceso</option>
                             <?php
                             if ($PuedeAdministrar or $PuedeGeneral) {
                                 $QueriProc = "SELECT CodGestion, Colegio, CodProceso, NomProceso FROM calidad.procesos ORDER BY CodGestion, NomProceso";
@@ -1797,7 +1876,7 @@ if ($_GET['Filtrar'] == 1) {
                     </div>
                     <div class="col-sm-2 form-group" title="Tipo de Registro">
                         <select name="FiltroTipo" class="form-control" id="FiltroTipo">
-                            <option value="" selected>Tipo Registro</option>
+                            <option value="" selected>Tipo Registro (Todos)</option>
                             <?php foreach ($mTipoRegistro as $Clave => $Valor) { ?>
                                 <option value='<?php echo $Clave; ?>' <?php if ($_GET['FiltroTipo'] == $Clave) echo "selected"; ?>><?php echo $Clave; ?></option>
                             <?php } ?>
@@ -1805,7 +1884,7 @@ if ($_GET['Filtrar'] == 1) {
                     </div>
                     <div class="col-sm-2 form-group">
                         <select name="FiltroTipoAcciones" class="form-control" id="FiltroTipoAcciones">
-                            <option value="" selected>Todas</option>
+                            <option value="" selected>Todas las acciones</option>
                             <option value=1 <?php if ($_GET['FiltroTipoAcciones'] == 1) echo "selected"; ?>>Sin Acciones</option>
                             <option value=2 <?php if ($_GET['FiltroTipoAcciones'] == 2) echo "selected"; ?>>Con Acciones</option>
                             <option value=3 <?php if ($_GET['FiltroTipoAcciones'] == 3) echo "selected"; ?>>Por Cerrar</option>
@@ -1871,7 +1950,7 @@ if ($_GET['Filtrar'] == 1) {
                                         echo '<span class="fecha-cierre">' . DarFecha($Row['FCierre']) . '</span>';
                                         if ($PuedeReversar) {
                                             ?>
-                                            <a class="action-btn action-danger" onClick="ReversarNoConformidad(<?php echo $Row['NumeroNC']; ?>)" title="Reversar no conformidad"><i class="bi bi-arrow-counterclockwise"></i></a>
+                                            <a class="action-btn action-danger" onClick="ReversarNoConformidad({{ $Row['NumeroNC'] }})" title="Reversar no conformidad"><i class="bi bi-arrow-counterclockwise"></i></a>
                                             <?php
                                         }
                                     } else {
