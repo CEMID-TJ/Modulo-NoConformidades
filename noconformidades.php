@@ -376,7 +376,7 @@ elseif ($_GET['TipoModificar'] == md5('AjaxSeguimientos' . date('d')) and $_GET[
                 </button>
             </div>
             <div class="row">
-                <div class="col-md-6 form-group">
+                <div class="col-sm-6 form-group">
                     <label class="label-xsmall">Objetivo principal del plan de Acción</label>
                     <textarea
                         name="Accion<?php echo $mRegistro; ?>"
@@ -385,7 +385,7 @@ elseif ($_GET['TipoModificar'] == md5('AjaxSeguimientos' . date('d')) and $_GET[
                         rows="2"
                     ><?php echo $RowNCS['Accion']; ?></textarea>
                 </div>
-                <div class="col-md-6 form-group">
+                <div class="col-sm-6 form-group">
                     <label class="label-xsmall">Resultado Esperado</label>
                     <textarea
                         name="Resultado<?php echo $mRegistro; ?>"
@@ -394,7 +394,7 @@ elseif ($_GET['TipoModificar'] == md5('AjaxSeguimientos' . date('d')) and $_GET[
                         rows="2"
                     ><?php echo $RowNCS['Resultado']; ?></textarea>
                 </div>
-                <div class="col-md-3 form-group">
+                <div class="col-sm-3 form-group">
                     <label class="label-xsmall">Fecha Seguimiento</label>
                     <input
                         type="text"
@@ -405,7 +405,7 @@ elseif ($_GET['TipoModificar'] == md5('AjaxSeguimientos' . date('d')) and $_GET[
                         value="<?php echo DarFecha($RowNCS["Fecha"]); ?>"
                     >
                 </div>
-                <div class="col-md-6 form-group">
+                <div class="col-sm-6 form-group">
                     <label class="label-xsmall">Realizado Por</label>
                     <input
                         type="text"
@@ -415,7 +415,7 @@ elseif ($_GET['TipoModificar'] == md5('AjaxSeguimientos' . date('d')) and $_GET[
                         value="<?php echo $RowNCS["RealizadoPor"]; ?>"
                     >
                 </div>
-                <div class="col-md-3 form-group">
+                <div class="col-sm-3 form-group">
                     <label class="label-xsmall">Alcanzado</label>
                     <select
                         name="Alcanzado<?php echo $mRegistro; ?>"
@@ -1304,12 +1304,19 @@ if ($_GET['Filtrar'] == 1) {
 
         /* ===== Descripción modal móvil ===== */
         .desc-hint { display: none; }
-        .desc-modal-text { white-space: pre-wrap; word-break: break-word; font-size: 13.5px; line-height: 1.6; color: var(--text); }
 
         /* ===== RESPONSIVE ===== */
         @media (max-width: 991px) {
             .container { width: 100%; padding: 0 12px; }
             .btn-nav { width: 34px; height: 34px; }
+            .nc-box .nc-row { flex-direction: column; gap: 8px; }
+            .nc-box .nc-cell-4, .nc-box .nc-cell-6, .nc-box .nc-cell-8 { flex: 1 1 100%; width: 100%; }
+            .tableFixHead tbody tr[data-id] { cursor: pointer; }
+            .tableFixHead tbody tr[data-id]:active,
+            .tableFixHead tbody tr[data-id].fila-seleccionada {
+                border-color: var(--primary) !important;
+                box-shadow: 0 0 0 2px rgba(37, 99, 235, .22), var(--shadow-sm) !important;
+            }
         }
         @media (max-width: 767px) {
             body { font-size: 13px; }
@@ -1332,7 +1339,7 @@ if ($_GET['Filtrar'] == 1) {
             .tableFixHead.table-responsive {
                 max-height: calc(100vh - var(--navbar-height, 112px) - 130px);
                 border: none; border-radius: 0; box-shadow: none; background: transparent;
-                margin-bottom: 10px; overflow: auto;
+                margin-bottom: 10px; overflow: auto; -webkit-overflow-scrolling: touch;
             }
             .tableFixHead thead { display: none; }
             .tableFixHead table, .tableFixHead tbody, .tableFixHead tr, .tableFixHead td { display: block; width: 100%; }
@@ -1363,7 +1370,7 @@ if ($_GET['Filtrar'] == 1) {
                 display: inline-block; margin-top: 4px; font-size: 10.5px; font-weight: 700;
                 color: var(--primary); text-transform: uppercase; letter-spacing: .3px;
             }
-            .tableFixHead tbody td.desc-cell .desc-hint::after { content: 'Ver descripción completa ›'; }
+            .tableFixHead tbody td.desc-cell .desc-hint::after { content: 'Toca para ver el registro completo ›'; }
             .tableFixHead tbody tr.fila-seleccionada {
                 border-color: var(--primary) !important;
                 box-shadow: 0 0 0 2px rgba(37, 99, 235, .22), var(--shadow-sm) !important;
@@ -1420,13 +1427,19 @@ if ($_GET['Filtrar'] == 1) {
         }
         @media (max-width: 480px) {
             .navbar .collapse form > .col-sm-10 > .form-group { width: 100%; float: none; }
-            .nc-box .nc-row { flex-direction: column; gap: 8px; }
-            .nc-box .nc-cell-4, .nc-box .nc-cell-6, .nc-box .nc-cell-8 { flex: 1 1 100%; width: 100%; }
             .modal-footer { flex-direction: column; }
             .modal-footer .btn { width: 100%; }
             #FrmCerrarNoConformidad .col-sm-6, #FrmCerrarNoConformidad .col-sm-2, #FrmCerrarNoConformidad .col-sm-4 { width: 100%; float: none; }
             .actions-box { flex-wrap: wrap; }
             .btn-nav { flex: 1 1 0; min-width: 40px; }
+        }
+        @media (min-width: 768px) and (max-width: 991px) {
+            #ModalConsultaNoConformidad .modal-body { padding: 18px !important; }
+            .nc-detail-head { flex-direction: row; align-items: flex-start; }
+            .nc-detail-pdf { align-self: auto; }
+            .nc-detail-meta, .nc-followup-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+            .nc-detail-field--wide, .nc-detail-field--full { grid-column: 1 / -1; }
+            .nc-detail-columns > .nc-detail-section:only-child { grid-column: 1 / -1; }
         }
         body.modal-open .tableFixHead thead th { position: static !important; top: auto !important; }
     </style>
@@ -1612,13 +1625,7 @@ if ($_GET['Filtrar'] == 1) {
         }
 
         function EsVistaMovil() { return window.matchMedia && window.matchMedia('(max-width: 767px)').matches; }
-
-        function AbrirModalDescripcion(cell) {
-            var $txt = $(cell).find('.desc-contenido');
-            if (!$txt.length) { return; }
-            $('#ModalDescripcionNoConformidadBody').html($txt.html());
-            $('#ModalDescripcionNoConformidad').modal('show');
-        }
+        function EsVistaResponsive() { return window.matchMedia && window.matchMedia('(max-width: 991px)').matches; }
 
         function AjustarHintsDescripcion() {
             if (!EsVistaMovil()) { return; }
@@ -1631,20 +1638,21 @@ if ($_GET['Filtrar'] == 1) {
         }
         $(window).on('load resize', function () { AjustarHintsDescripcion(); });
 
-        $(document).on('touchstart mousedown', '#TBodyNoConformidad tr', function () {
-            if (!EsVistaMovil()) { return; }
+        $(document).on('touchstart mousedown', '#TBodyNoConformidad tr[data-id]', function () {
+            if (!EsVistaResponsive()) { return; }
             var $tr = $(this);
-            if ($tr.find('td.sin-resultados').length) { return; }
             $('#TBodyNoConformidad tr').removeClass('fila-seleccionada');
             $tr.addClass('fila-seleccionada');
         });
 
-        $(document).on('click', '#TBodyNoConformidad tr', function (e) {
-            if (!EsVistaMovil()) { return; }
+        $(document).on('click', '#TBodyNoConformidad tr[data-id]', function (e) {
+            if (!EsVistaResponsive()) { return; }
             var $tr = $(this);
-            if ($tr.find('td.sin-resultados').length) { return; }
-            if ($(e.target).closest('a, button, .acciones-cell, .fecha-cierre').length) { return; }
-            AbrirModalDescripcion($tr.find('.desc-cell'));
+            if ($(e.target).closest('a, button, input, select, textarea, .acciones-cell, .fecha-cierre').length) { return; }
+            var selection = window.getSelection();
+            if (selection && !selection.isCollapsed && this.contains(selection.anchorNode)) { return; }
+            var numeroNC = $tr.data('id');
+            if (numeroNC) { MostrarDivConsultaNoConformidad(numeroNC); }
         });
 
         function ValidarDetectadaEn(Valorcito) {
@@ -2099,7 +2107,7 @@ if ($_GET['Filtrar'] == 1) {
                 </thead>
                 <tbody id="TBodyNoConformidad">
                     <?php while ($Row = $Result->fetch_assoc()) { $mContadorFilas++; ?>
-                        <TR align=left>
+                        <TR align="left" data-id="<?php echo $Row['NumeroNC']; ?>">
                             <TD data-label="Fecha / ID SOLICITUD">
                                 <?php echo DarFechaHora($Row['FApertura'], 1); ?>
                                 (<a class="link-modern" style="cursor:pointer" onClick="MostrarDivConsultaNoConformidad(<?php echo $Row['NumeroNC'] ?>);"><?php echo $Row['NumeroNC']; ?></a>)
@@ -2199,24 +2207,6 @@ if ($_GET['Filtrar'] == 1) {
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-danger" id="BotCancelarModal" data-dismiss="modal"><i class="bi bi-x-lg"></i> Cerrar</button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- MODAL DESCRIPCIÓN (MÓVIL) -->
-<div class="modal fade" id="ModalDescripcionNoConformidad" tabindex="-1" role="dialog" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-scrollable" role="document" style="width:98%;max-width:640px">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title"><i class="bi bi-file-text"></i> Descripción</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Cerrar"><span aria-hidden="true">&times;</span></button>
-            </div>
-            <div class="modal-body">
-                <div id="ModalDescripcionNoConformidadBody" class="desc-modal-text"></div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-danger" data-dismiss="modal"><i class="bi bi-x-lg"></i> Cerrar</button>
             </div>
         </div>
     </div>
