@@ -1134,12 +1134,14 @@ if ($_GET['Filtrar'] == 1) {
         .tableFixHead.table-responsive {
             position: relative; background: #fff; border: 1.5px solid var(--border);
             border-radius: 14px; box-shadow: var(--shadow); padding: 0;
-            margin: 0 0 15px 0; overflow: visible; display: block;
+            margin: 0 0 15px 0; display: block;
+            max-height: calc(100vh - var(--navbar-height, 112px) - 100px);
+            overflow: auto; overscroll-behavior: contain; scrollbar-gutter: stable;
         }
         .tableFixHead table { width: 100%; margin: 0; }
         .tableFixHead thead th {
-            position: sticky; top: calc(var(--navbar-height, 96px) - 1px);
-            z-index: 1029; background: #eef2f7 !important; color: #1e293b !important;
+            position: sticky; top: 0;
+            z-index: 5; background: #eef2f7 !important; color: #1e293b !important;
             font-size: 11px; text-transform: uppercase; letter-spacing: .5px;
             font-weight: 700; text-align: center !important; vertical-align: middle !important;
             border-bottom: 1.5px solid var(--border) !important; padding: 14px 16px !important;
@@ -1327,7 +1329,11 @@ if ($_GET['Filtrar'] == 1) {
             .actions-box { width: 100%; height: auto; min-height: 52px; padding: 4px; gap: 4px; justify-content: center; box-sizing: border-box; }
             .btn-nav { width: 44px; height: 44px; font-size: 18px; }
 
-            .tableFixHead.table-responsive { border: none; border-radius: 0; box-shadow: none; background: transparent; margin-bottom: 10px; }
+            .tableFixHead.table-responsive {
+                max-height: calc(100vh - var(--navbar-height, 112px) - 130px);
+                border: none; border-radius: 0; box-shadow: none; background: transparent;
+                margin-bottom: 10px; overflow: auto;
+            }
             .tableFixHead thead { display: none; }
             .tableFixHead table, .tableFixHead tbody, .tableFixHead tr, .tableFixHead td { display: block; width: 100%; }
             .tableFixHead tbody tr {
