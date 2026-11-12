@@ -14,8 +14,9 @@ $PuedeAdministrar = in_array($_SESSION['Usuario'], array(
     '52841712',    // Diana Álvarez
     '1233909122',  // Eduardo León
     '1022928448',  // JABIER BARRERA
-    '1013602451'
+    '1013602451'   // Thomas Barrero
 ));
+$PuedeCerrar = InList($_SESSION["Perfil"], "DIREC", "ADMIN", "DUEPR") || $PuedeAdministrar;
 
 $PuedeReversar = in_array($_SESSION['Usuario'], array(
     (InList($_SESSION["Perfil"], "ADMIN") ? $_SESSION['Usuario'] : "98381246"),
@@ -109,131 +110,82 @@ if ($_GET['TipoModificar'] == md5('AjaxMostrarNoConformidad' . date('d')) and $_
     $Result = $mysqli->query($Queri);
 
     if ($Row = $Result->fetch_assoc()) { ?>
-        <div class="col-sm-2 panel panel-default">
-            <label class="label-xsmall">Consecutivo:</label> <?php echo $Row['NumeroNC']; ?>
-        </div>
-        <div class="col-sm-4 panel panel-default">
-            <label class="label-xsmall">Responsable de la apertura:</label> <?php echo $Row['NomResponsable']; ?>
-        </div>
-        <div class="col-sm-6 panel panel-default">
-            <label class="label-xsmall">Tipo:</label> <?php echo $Row['Tipo'] . ' - ' . $mTipoRegistro[$Row['Tipo']]; ?>
-        </div>
-        <div class="clearfix"></div>
-
-        <div class="col-sm-3 panel panel-default">
-            <label class="label-xsmall">Gestión:</label> <?php echo $Row['NomGestion']; ?>
-        </div>
-        <div class="col-sm-3 panel panel-default">
-            <label class="label-xsmall">Proceso:</label> <?php echo $Row['Proceso']; ?>
-        </div>
-        <div class="col-sm-3 panel panel-default">
-            <label class="label-xsmall">Fecha de apertura:</label> <?php echo DarFecha($Row['FApertura']); ?>
-        </div>
-        <div class="col-sm-3 panel panel-default">
-            <label class="label-xsmall">Detectada en:</label> <?php echo $Row['DetectadaEn']; ?>
-        </div>
-        <div class="clearfix"></div>
-
-        <div class="col-sm-12 panel panel-default">
-            <label class="label-xsmall">Descripción:</label> <?php echo $Row['Descripcion']; ?>
-        </div>
-        <div class="clearfix"></div>
-
-        <div class="col-sm-12 panel panel-default">
-            <label class="label-xsmall">Relación de actividades:</label> <?php echo $Row['Correccion']; ?>
-        </div>
-        <?php if ($Row['Tipo'] == 'Corrección') { ?>
-            <div class="clearfix"></div>
-            <div class="col-sm-8 panel panel-default">
-                <label class="label-xsmall">Con la acción determinada se garantiza que la falla o posible materialización del riesgo no se presente de nuevo?:</label>
-                <?php echo ($Row['RequiereAC'] == 1 ? 'Si' : ($Row['RequiereAC'] == -1 ? 'No' : '')); ?>
-            </div>
-            <?php if ($Row['RequiereAC'] == -1) { ?>
-                <div class="col-sm-4 panel panel-default">
-                    <label class="label-xsmall">ID de la acción correctiva vinculada a esta corrección:</label>
-                    <a style="cursor:pointer" onClick="MostrarDivConsultaNoConformidad(<?php echo $Row['NumeroNCAccionCorrectiva'] ?>);" title="Ver <?php echo $Row['NumeroNCAccionCorrectiva']; ?> acción correctiva vinculada a esta corrección"><?php echo $Row['NumeroNC']; ?></a>
+        <div class="nc-detail">
+            <div class="nc-detail-head">
+                <div class="nc-detail-head-main">
+                    <div class="nc-detail-title-row">
+                        <span class="nc-detail-number">NC <?php echo $Row['NumeroNC']; ?></span>
+                        <span class="nc-detail-badge"><?php echo $Row['Tipo']; ?></span>
+                        <span class="nc-detail-badge nc-detail-status <?php echo ($Row['FCierre'] > 0 ? 'is-closed' : 'is-open'); ?>"><?php echo ($Row['FCierre'] > 0 ? 'Cerrada' : 'Abierta'); ?></span>
+                    </div>
                 </div>
+                <?php if (file_exists("../../Archivos/NoConformidades/" . trim($_GET['NumeroNC']) . ".pdf")) { ?>
+                    <a class="nc-detail-pdf" href="../file.php?Tipo=<?php echo md5("NoConformidades" . trim($Row['NumeroNC'])); ?>&mFile=<?php echo trim($Row['NumeroNC']); ?>" target="_blank"><i class="bi bi-file-earmark-pdf"></i> Ver adjunto</a>
+                <?php } ?>
+            </div>
+            
+            <div class="nc-detail-meta">
+                <div class="nc-detail-field"><span class="nc-detail-label">Responsable de la apertura</span><span class="nc-detail-value"><?php echo $Row['NomResponsable']; ?></span></div>
+                <div class="nc-detail-field"><span class="nc-detail-label">Gestión</span><span class="nc-detail-value"><?php echo $Row['NomGestion']; ?></span></div>
+                <div class="nc-detail-field"><span class="nc-detail-label">Proceso</span><span class="nc-detail-value"><?php echo $Row['Proceso']; ?></span></div>
+                <div class="nc-detail-field"><span class="nc-detail-label">Fecha de apertura</span><span class="nc-detail-value"><?php echo DarFecha($Row['FApertura']); ?></span></div>
+                <div class="nc-detail-field"><span class="nc-detail-label">Detectada en</span><span class="nc-detail-value"><?php echo $Row['DetectadaEn']; ?></span></div>
+                <div class="nc-detail-field"><span class="nc-detail-label">Fecha acordada para la revisión</span><span class="nc-detail-value"><?php echo DarFecha($Row['FRevision']); ?></span></div>
+                <?php if ($Row['Tipo'] == 'Corrección') { ?>
+                    <div class="nc-detail-field nc-detail-field--wide"><span class="nc-detail-label">¿Se garantiza que la falla no se presente de nuevo?</span><span class="nc-detail-value"><?php echo ($Row['RequiereAC'] == 1 ? 'Sí' : ($Row['RequiereAC'] == -1 ? 'No' : '—')); ?></span></div>
+                    <?php if ($Row['RequiereAC'] == -1) { ?>
+                        <div class="nc-detail-field"><span class="nc-detail-label">ID de la acción correctiva vinculada</span><span class="nc-detail-value"><a class="link-modern" style="cursor:pointer" onClick="MostrarDivConsultaNoConformidad(<?php echo $Row['NumeroNCAccionCorrectiva']; ?>);"><?php echo $Row['NumeroNCAccionCorrectiva']; ?></a></span></div>
+                    <?php } ?>
+                <?php } ?>
+            </div>
+
+            <section class="nc-detail-section"><h6 class="nc-detail-section-title">Descripción</h6><div class="nc-detail-desc"><div class="nc-detail-text"><?php echo $Row['Descripcion']; ?></div></div></section>
+            <div class="nc-detail-columns">
+                <section class="nc-detail-section"><h6 class="nc-detail-section-title">Relación de actividades</h6><div class="nc-detail-text"><?php echo $Row['Correccion']; ?></div></section>
+                <section class="nc-detail-section"><h6 class="nc-detail-section-title">Causas o ventajas</h6><div class="nc-detail-text"><?php echo $Row['Causas']; ?></div></section>
+                <section class="nc-detail-section"><h6 class="nc-detail-section-title">Objetivo principal del plan de acción</h6><div class="nc-detail-text"><?php echo $Row['Accion']; ?></div></section>
+            </div>
+
+            <?php
+            $QueriNCS = "SELECT NCS.* FROM calidad.ncseguimiento NCS Where NumeroNC='" . $_GET['NumeroNC'] . "' " . ($PuedeAdministrar ? "" : "AND Borrada=0") . " ORDER BY ConsecutivoS";
+            $ResultNCS = $mysqli->query($QueriNCS);
+            if ($ResultNCS->num_rows > 0) { ?>
+                <section class="nc-detail-section">
+                    <h6 class="nc-detail-section-title">Seguimientos</h6>
+                    <div class="nc-followups">
+                    <?php while ($RowNCS = $ResultNCS->fetch_assoc()) { ?>
+                        <article class="nc-followup">
+                            <div class="nc-followup-head">
+                                <span class="nc-followup-title">Seguimiento <?php echo $RowNCS['ConsecutivoS']; ?></span>
+                                <?php if ($RowNCS['Borrada']) { ?><span class="nc-detail-badge nc-detail-badge-danger">Borrada</span><?php } ?>
+                            </div>
+                            <div class="nc-followup-grid">
+                                <div class="nc-detail-field nc-detail-field--full"><span class="nc-detail-label">Acción</span><span class="nc-detail-value"><?php echo $RowNCS['Accion']; ?></span></div>
+                                <div class="nc-detail-field nc-detail-field--full"><span class="nc-detail-label">Resultado esperado</span><span class="nc-detail-value"><?php echo $RowNCS['Resultado']; ?></span></div>
+                                <div class="nc-detail-field"><span class="nc-detail-label">Fecha apertura</span><span class="nc-detail-value"><?php echo DarFechaHora($RowNCS["FHSeguimiento"], 3); ?></span></div>
+                                <div class="nc-detail-field"><span class="nc-detail-label">Fecha seguimiento</span><span class="nc-detail-value"><?php echo DarFecha($RowNCS["Fecha"]); ?></span></div>
+                                <div class="nc-detail-field"><span class="nc-detail-label">Realizado por</span><span class="nc-detail-value"><?php echo $RowNCS["RealizadoPor"]; ?></span></div>
+                                <div class="nc-detail-field"><span class="nc-detail-label">Alcanzado</span><span class="nc-detail-value"><?php echo ($RowNCS["Alcanzado"] == 1 ? "Sí" : ($RowNCS["Alcanzado"] == -1 ? "No" : "—")); ?></span></div>
+                            </div>
+                        </article>
+                    <?php } ?>
+                    </div>
+                </section>
             <?php } ?>
-        <?php } ?>
-        <div class="clearfix"></div>
 
-        <div class="col-sm-9 panel panel-default">
-            <label class="label-xsmall">Causas o Ventajas:</label> <?php echo $Row['Causas']; ?>
+            <?php if ($Row['FCierre'] > 0) { ?>
+                <section class="nc-detail-section">
+                    <h6 class="nc-detail-section-title">Datos del cierre</h6>
+                    <div class="nc-detail-meta">
+                        <div class="nc-detail-field nc-detail-field--full"><span class="nc-detail-label">Resultados de la revisión de la eficacia</span><span class="nc-detail-value"><?php echo $Row['ResultadoRevision']; ?></span></div>
+                        <div class="nc-detail-field nc-detail-field--full"><span class="nc-detail-label">Motivos del cierre</span><span class="nc-detail-value"><?php echo $Row['MotivoCierre']; ?></span></div>
+                        <div class="nc-detail-field"><span class="nc-detail-label">Nueva acción</span><span class="nc-detail-value"><?php echo $Row['NuevaAccion']; ?></span></div>
+                        <div class="nc-detail-field"><span class="nc-detail-label">Fecha del cierre</span><span class="nc-detail-value"><?php echo DarFecha($Row['FCierre']); ?></span></div>
+                        <div class="nc-detail-field"><span class="nc-detail-label">Responsable del cierre</span><span class="nc-detail-value"><?php echo $Row['RCierre']; ?></span></div>
+                    </div>
+                </section>
+            <?php } ?>
         </div>
-        <div class="col-sm-3 panel panel-default">
-            <label class="label-xsmall">Fecha acordada para la revisión:</label> <?php echo DarFecha($Row['FRevision']); ?>
-        </div>
-        <div class="clearfix"></div>
-
-        <?php if (file_exists("../../Archivos/NoConformidades/" . trim($_GET['NumeroNC']) . ".pdf")) {
-            echo "<a href='../file.php?Tipo=" . md5("NoConformidades" . trim($Row['NumeroNC'])) . "&mFile=" . trim($Row['NumeroNC']) . "' class='col-sm-12 btn btn-default btn-file' title='Ver Archivo Adjunto' target='_blank'><img src='../imagenes/pdf.png' border='0'>Ver Archivo Adjunto</a>";
-        } ?>
-        <div class="clearfix"></div>
-
-        <?php
-        $QueriNCS = "SELECT NCS.*
-                    FROM calidad.ncseguimiento NCS
-                    Where NumeroNC='" . $_GET['NumeroNC'] . "' " . ($PuedeAdministrar ? "" : "AND Borrada=0") . "
-                    ORDER BY ConsecutivoS";
-        $ResultNCS = $mysqli->query($QueriNCS);
-
-        if ($ResultNCS->num_rows > 0) { ?>
-            <div class="col-sm-12 panel panel-primary">
-                <h5><b>SEGUIMIENTOS</b></h5>
-        <?php }
-
-        while ($RowNCS = $ResultNCS->fetch_assoc()) { ?>
-            <div class="col-sm-6 panel panel-default">
-                <label class="label-xsmall">(<?php echo $RowNCS["ConsecutivoS"]; ?>)Acción (Correctiva o Preventiva)</label> <?php echo ($RowNCS['Borrada'] ? ('<b style="background:red">BORRADA ' . $RowNCS['Accion'] . '</b>') : $RowNCS['Accion']); ?>
-            </div>
-            <div class="col-sm-6 panel panel-default">
-                <label class="label-xsmall">Resultado Esperado</label> <?php echo $RowNCS['Resultado']; ?>
-            </div>
-            <div class="clearfix"></div>
-
-            <div class="col-sm-3 panel panel-default">
-                <label class="label-xsmall">Fecha Apertura:</label> <?php echo DarFechaHora($RowNCS["FHSeguimiento"], 3); ?>
-            </div>
-            <div class="col-sm-3 panel panel-default">
-                <label class="label-xsmall">Fecha Seguimiento:</label> <?php echo DarFecha($RowNCS["Fecha"]); ?>
-            </div>
-            <div class="col-sm-4 panel panel-default">
-                <label class="label-xsmall">Realizado Por:</label> <?php echo $RowNCS["RealizadoPor"]; ?>
-            </div>
-            <div class="col-sm-2 panel panel-default">
-                <label class="label-xsmall">Alcanzado:</label> <?php echo ($RowNCS["Alcanzado"] == 1 ? "Si" : ($RowNCS["Alcanzado"] == -1 ? "No" : "")); ?>
-            </div>
-            <div class="clearfix"></div>
-        <?php }
-
-        if ($ResultNCS->num_rows > 0) { ?>
-            </div>
-        <?php }
-
-        if ($Row['FCierre'] > 0) { ?>
-            <div class="col-sm-12 panel panel-primary">
-                <h5><b>DATOS DEL CIERRE</b></h5>
-
-                <div class="col-sm-6 panel panel-default">
-                    <label class="label-xsmall">Resultados de la revisión de la <i title="Entiéndase la eficacia como el grado en que se realizan las actividades planificadas y se logran los resultados planificados"><u>eficacia</u></i> de las acciones tomadas:</label> <?php echo $Row['ResultadoRevision']; ?>
-                </div>
-                <div class="col-sm-6 panel panel-default">
-                    <label class="label-xsmall">Motivos del Cierre:</label> <?php echo $Row['MotivoCierre']; ?>
-                </div>
-                <div class="clearfix"></div>
-
-                <div class="col-sm-6 panel panel-default">
-                    <label class="label-xsmall">Nueva Acción?:</label> <?php echo $Row['NuevaAccion']; ?>
-                </div>
-                <div class="col-sm-2 panel panel-default">
-                    <label class="label-xsmall">Fecha del Cierre:</label> <?php echo DarFecha($Row['FCierre']); ?>
-                </div>
-                <div class="col-sm-4 panel panel-default">
-                    <label class="label-xsmall">Responsable del Cierre:</label> <?php echo $Row['RCierre']; ?>
-                </div>
-            </div>
-        <?php } ?>
-
     <?php } else {
         echo "<b>No existe</b>";
     }
@@ -405,42 +357,76 @@ elseif ($_GET['TipoModificar'] == md5('AjaxSeguimientos' . date('d')) and $_GET[
     $mRegistro = 0;
 
     while ($RowNCS = $ResultNCS->fetch_assoc() or $mRegistro == 0) {
-        $mRegistro++; ?>
-        <div class="col-sm-12 panel panel-primary" id="DivSeguimiento<?php echo $mRegistro; ?>">
+        $mRegistro++;
+        ?>
+        <div class="col-sm-12 panel panel-primary nc-section seguimiento-card" id="DivSeguimiento<?php echo $mRegistro; ?>">
             <input name="Borrada<?php echo $mRegistro; ?>" type="hidden" id="Borrada<?php echo $mRegistro; ?>">
-            <div class="col-sm-6 panel form-group">
-                <label class="label-xsmall">Objetivo principal del plan de Acción</label>
-                <div class="close" id="SpanSeguimiento<?php echo $mRegistro; ?>"><?php echo $mRegistro; ?></div>
-                <textarea name="Accion<?php echo $mRegistro; ?>" id="Accion<?php echo $mRegistro; ?>" class="form-control label-xsmall" placeholder="Objetivo principal del plan de Acción" rows="2"><?php echo $RowNCS['Accion']; ?></textarea>
-            </div>
-            <div class="col-sm-6 panel form-group">
-                <label class="label-xsmall">Resultado Esperado</label>
-                <textarea name="Resultado<?php echo $mRegistro; ?>" id="Resultado<?php echo $mRegistro; ?>" class="form-control label-xsmall" placeholder="Resultado Esperado" rows="2"><?php echo $RowNCS['Resultado']; ?></textarea>
-            </div>
-            <div class="clearfix"></div>
-
-            <div class="col-sm-3 panel form-group">
-                <label class="label-xsmall">Fecha Seguimiento:</label>
-                <input type="text" name="Fecha<?php echo $mRegistro; ?>" id="Fecha<?php echo $mRegistro; ?>" class="form-control" onChange="ValidarFecha(this)" onBlur="ValidarFecha(this)" value="<?php echo DarFecha($RowNCS["Fecha"]); ?>">
-            </div>
-            <div class="col-sm-6 panel form-group">
-                <label class="label-xsmall">Realizado Por:</label>
-                <input type="text" name="RealizadoPor<?php echo $mRegistro; ?>" id="RealizadoPor<?php echo $mRegistro; ?>" class="form-control" value="<?php echo $RowNCS["RealizadoPor"]; ?>">
-            </div>
-            <div class="col-sm-2 panel form-group">
-                <label class="label-xsmall">Alcanzado:</label>
-                <select name="Alcanzado<?php echo $mRegistro; ?>" class="form-control" id="Alcanzado<?php echo $mRegistro; ?>">
-                    <option value=0 selected></option>
-                    <option value=1 <?php if ($RowNCS["Alcanzado"] == 1) echo "selected"; ?>>SI</option>
-                    <option value=-1 <?php if ($RowNCS["Alcanzado"] == -1) echo "selected"; ?>>NO</option>
-                </select>
-            </div>
-            <div class="col-sm-1 panel form-group">
-                <button type="button" class="close" id="BotBorrarSeguimiento<?php echo $mRegistro; ?>">
-                    <a style="cursor:pointer" onClick="BorrarSeguimiento(this);" title="Borrar este seguimiento">
-                        <img hspace='2' width='16' height='16' src='../imagenes/invalid.png' border='0'/>
-                    </a>
+            <div class="seguimiento-header">
+                <span class="badge-seguimiento" id="SpanSeguimiento<?php echo $mRegistro; ?>">
+                    Seguimiento <?php echo $mRegistro; ?>
+                </span>
+                <button
+                    type="button"
+                    class="action-btn action-danger btn-borrar-seguimiento"
+                    id="BotBorrarSeguimiento<?php echo $mRegistro; ?>"
+                    onClick="BorrarSeguimiento(this);"
+                    title="Borrar este seguimiento"
+                >
+                    <i class="bi bi-trash3"></i>
                 </button>
+            </div>
+            <div class="row">
+                <div class="col-md-6 form-group">
+                    <label class="label-xsmall">Objetivo principal del plan de Acción</label>
+                    <textarea
+                        name="Accion<?php echo $mRegistro; ?>"
+                        id="Accion<?php echo $mRegistro; ?>"
+                        class="form-control"
+                        rows="2"
+                    ><?php echo $RowNCS['Accion']; ?></textarea>
+                </div>
+                <div class="col-md-6 form-group">
+                    <label class="label-xsmall">Resultado Esperado</label>
+                    <textarea
+                        name="Resultado<?php echo $mRegistro; ?>"
+                        id="Resultado<?php echo $mRegistro; ?>"
+                        class="form-control"
+                        rows="2"
+                    ><?php echo $RowNCS['Resultado']; ?></textarea>
+                </div>
+                <div class="col-md-3 form-group">
+                    <label class="label-xsmall">Fecha Seguimiento</label>
+                    <input
+                        type="text"
+                        name="Fecha<?php echo $mRegistro; ?>"
+                        id="Fecha<?php echo $mRegistro; ?>"
+                        class="form-control"
+                        placeholder="dd/mm/aaaa"
+                        value="<?php echo DarFecha($RowNCS["Fecha"]); ?>"
+                    >
+                </div>
+                <div class="col-md-6 form-group">
+                    <label class="label-xsmall">Realizado Por</label>
+                    <input
+                        type="text"
+                        name="RealizadoPor<?php echo $mRegistro; ?>"
+                        id="RealizadoPor<?php echo $mRegistro; ?>"
+                        class="form-control"
+                        value="<?php echo $RowNCS["RealizadoPor"]; ?>"
+                    >
+                </div>
+                <div class="col-md-3 form-group">
+                    <label class="label-xsmall">Alcanzado</label>
+                    <select
+                        name="Alcanzado<?php echo $mRegistro; ?>"
+                        class="form-control"
+                        id="Alcanzado<?php echo $mRegistro; ?>"
+                    >
+                        <option value="0" <?php if ($RowNCS["Alcanzado"] == 0) echo "selected"; ?>></option>
+                        <option value="1" <?php if ($RowNCS["Alcanzado"] == 1) echo "selected"; ?>>Sí</option>
+                        <option value="-1" <?php if ($RowNCS["Alcanzado"] == -1) echo "selected"; ?>>No</option>
+                    </select>
+                </div>
             </div>
         </div>
     <?php
@@ -697,6 +683,43 @@ elseif ($_POST['TipoModificar'] == md5('JorReversarNoConformidad' . date('d')) a
 
 
 /* ============================================================================
+   AJAX - ELIMINAR ARCHIVO ADJUNTO DE UNA NO CONFORMIDAD (JSON)
+   ============================================================================ */
+elseif ($_POST['TipoModificar'] == md5('JorEliminarArchivo' . date('d')) and $_POST['NumeroNC']) {
+
+    try {
+        $numNC = intval($_POST['NumeroNC']);
+        if ($numNC <= 0) {
+            echo json_encode(['status' => 'error', 'message' => 'Registro inválido.']);
+            mysqli_close($mysqli);
+            exit;
+        }
+
+        $pdfPath = "../../Archivos/NoConformidades/" . $numNC . ".pdf";
+        if (!is_file($pdfPath)) {
+            echo json_encode(['status' => 'error', 'message' => 'El archivo adjunto no existe.']);
+            mysqli_close($mysqli);
+            exit;
+        }
+
+        if (!unlink($pdfPath)) {
+            echo json_encode(['status' => 'error', 'message' => 'No se pudo eliminar el archivo adjunto.']);
+            mysqli_close($mysqli);
+            exit;
+        }
+
+        echo json_encode(['status' => 'success']);
+        mysqli_close($mysqli);
+        exit;
+    } catch (Exception $e) {
+        echo json_encode(['status' => 'error', 'message' => $e->getMessage()]);
+        mysqli_close($mysqli);
+        exit;
+    }
+}
+
+
+/* ============================================================================
    DATOS PARA LA VISTA PRINCIPAL
    ============================================================================ */
 
@@ -832,6 +855,7 @@ if ($_GET['Filtrar'] == 1) {
             --shadow-sm: 0 1px 3px rgba(11, 19, 34, .08);
             --shadow: 0 4px 14px rgba(11, 19, 34, .10);
             --shadow-lg: 0 20px 60px rgba(11, 19, 34, .25);
+            --navbar-height: 112px;
         }
 
         html { background: var(--bg-body); overflow-y: scroll !important; scrollbar-gutter: stable; }
@@ -1007,6 +1031,66 @@ if ($_GET['Filtrar'] == 1) {
         .nc-value { color: var(--text); font-size: 13.5px; line-height: 1.5; word-break: break-word; }
         .nc-section { padding: 16px 20px !important; }
 
+        /* ===== Detalle de consulta ===== */
+        .nc-detail {
+            display: flex; flex-direction: column; gap: 18px;
+            width: 100%; max-width: 1200px; margin: 0 auto;
+        }
+        .nc-detail-head {
+            display: flex; align-items: flex-start; justify-content: space-between;
+            gap: 12px; flex-wrap: wrap;
+        }
+        .nc-detail-head-main { min-width: 0; }
+        .nc-detail-title-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+        .nc-detail-number { color: var(--text); font-size: 20px; font-weight: 800; line-height: 1.1; }
+        .nc-detail-badge {
+            display: inline-flex; align-items: center; max-width: 100%;
+            padding: 4px 9px; border-radius: 999px; background: #eef2f7; color: #334155;
+            font-size: 10.5px; font-weight: 700; line-height: 1.35; overflow-wrap: anywhere;
+        }
+        .nc-detail-status.is-open { background: var(--primary-soft); color: var(--primary); }
+        .nc-detail-status.is-closed { background: #f1f5f9; color: #475569; }
+        .nc-detail-badge-danger { background: var(--danger-bg); color: var(--danger); }
+        .nc-detail-pdf {
+            display: inline-flex; align-items: center; gap: 6px; padding: 6px 10px;
+            border: 1px solid var(--danger-border); border-radius: 8px;
+            background: var(--danger-bg); color: var(--danger); font-size: 12px;
+            font-weight: 600; text-decoration: none !important; white-space: nowrap;
+        }
+        .nc-detail-pdf:hover { background: #fecaca; color: var(--danger); }
+        .nc-detail-meta {
+            display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px 20px;
+        }
+        .nc-detail-field { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+        .nc-detail-field--wide { grid-column: span 2; }
+        .nc-detail-field--full { grid-column: 1 / -1; }
+        .nc-detail-label {
+            color: #64748b; font-size: 10.5px; font-weight: 700;
+            letter-spacing: .2px; text-transform: none;
+        }
+        .nc-detail-value { color: var(--text); font-size: 13px; line-height: 1.45; overflow-wrap: anywhere; }
+        .nc-detail-empty { color: #94a3b8; }
+        .nc-detail-section { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+        .nc-detail-section-title {
+            margin: 0; padding-bottom: 6px; border-bottom: 1px solid #e2e8f0;
+            color: var(--text); font-size: 12.5px; font-weight: 700;
+        }
+        .nc-detail-text {
+            color: var(--text); font-size: 13px; line-height: 1.6;
+            white-space: pre-line; overflow-wrap: anywhere;
+        }
+        .nc-detail-desc {
+            padding: 12px 14px; border: 1px solid var(--border-soft);
+            border-radius: 10px; background: #fff;
+        }
+        .nc-detail-columns { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; }
+        .nc-detail-columns > .nc-detail-section:only-child { grid-column: 1 / -1; }
+        .nc-followups { display: flex; flex-direction: column; gap: 10px; }
+        .nc-followup { padding: 12px 14px; border: 1px solid #e2e8f0; border-radius: 8px; background: #fff; }
+        .nc-followup-head { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 10px; }
+        .nc-followup-title { color: var(--text); font-size: 12px; font-weight: 700; }
+        .nc-followup-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px 18px; }
+
         /* ===== Seguimiento header ===== */
         .seguimiento-header {
             display: flex; align-items: center; justify-content: flex-start;
@@ -1019,6 +1103,21 @@ if ($_GET['Filtrar'] == 1) {
             padding: 3px 14px; font-size: 11px; font-weight: 700; line-height: 1.5;
             letter-spacing: .3px; text-transform: uppercase;
             box-shadow: 0 1px 4px rgba(37, 99, 235, .25);
+        }
+        .seguimiento-card {
+            transition: border-color .3s ease, box-shadow .3s ease;
+            border: 1.5px solid var(--border-soft) !important;
+            padding: 24px 28px !important;
+            border-radius: 12px;
+            background: #fff !important;
+        }
+        .seguimiento-card:hover {
+            border-color: var(--primary) !important;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, .15);
+        }
+        .seguimiento-card.card-eliminar-hover {
+            border-color: var(--danger) !important;
+            box-shadow: 0 4px 12px rgba(220, 38, 38, .15);
         }
         #DivSeguimientos .form-group { padding-left: 8px !important; padding-right: 8px !important; }
         .btn-borrar-seguimiento {
@@ -1074,6 +1173,8 @@ if ($_GET['Filtrar'] == 1) {
             vertical-align: middle; line-height: 1; touch-action: manipulation;
         }
         .action-btn i { display: inline-flex; align-items: center; justify-content: center; line-height: 1; font-size: 15px; }
+        .action-view { color: var(--primary); background: var(--primary-soft); }
+        .action-view:hover { background: #dbeafe; border-color: #bfdbfe; color: var(--primary-hover); }
         .action-edit { color: var(--primary); background: var(--primary-soft); }
         .action-edit:hover { background: #dbeafe; border-color: #bfdbfe; color: var(--primary-hover); }
         .action-list { color: var(--purple); background: var(--purple-bg); }
@@ -1097,14 +1198,20 @@ if ($_GET['Filtrar'] == 1) {
 
         /* ===== Modales ===== */
         .modal-content { border-radius: 14px !important; border: none !important; box-shadow: var(--shadow-lg) !important; overflow: hidden; }
-        .modal-header { background: #eef2f7; border-bottom: 1.5px solid var(--border) !important; padding: 16px 22px !important; }
+        .modal-header {
+            display: flex; align-items: center; justify-content: space-between; gap: 12px;
+            background: #eef2f7; border-bottom: 1.5px solid var(--border) !important;
+            padding: 16px 22px !important;
+        }
         .modal-title {
             font-weight: 700; color: var(--text); font-size: 15px;
-            display: inline-flex; align-items: center; gap: 9px; margin: 0;
+            display: inline-flex; align-items: center; gap: 9px; flex: 1 1 auto;
+            min-width: 0; margin: 0;
         }
         .modal-title i { color: var(--primary); font-size: 18px; }
         .modal-header .close {
             opacity: .55; font-size: 24px; font-weight: 300; color: var(--text-muted);
+            float: none; flex: 0 0 auto; margin: 0; padding: 0 4px;
             transition: all .15s; text-shadow: none !important;
         }
         .modal-header .close:hover { opacity: 1; color: var(--danger); transform: rotate(90deg); }
@@ -1118,19 +1225,22 @@ if ($_GET['Filtrar'] == 1) {
         .modal-dialog-scrollable .modal-body { max-height: calc(100vh - 170px); overflow-y: auto; }
 
         /* ===== Adjuntar archivo ===== */
-        .btn-file.modern-file-input {
+        .btn-upload-file {
             display: flex !important; align-items: center; justify-content: center;
-            gap: 10px; padding: 14px 20px !important;
-            border: 2px dashed var(--danger-border) !important; background: #fef2f2 !important;
-            color: var(--danger-hover) !important; border-radius: 10px !important;
-            width: 100%; font-weight: 600; font-size: 13px; transition: all .15s;
-            text-decoration: none !important; text-align: center !important;
-            cursor: pointer; user-select: none;
+            gap: 10px; padding: 12px 16px !important;
+            border: 1.5px solid var(--danger) !important; background: var(--danger-bg) !important;
+            color: var(--danger) !important; border-radius: 8px !important;
+            width: 100%; font-weight: 600; font-size: 13px; transition: all .2s ease;
+            text-decoration: none !important; text-align: center !important; cursor: pointer;
         }
-        .btn-file.modern-file-input, .btn-file.modern-file-input * { color: var(--danger) !important; }
-        .btn-file.modern-file-input i { font-size: 20px; }
-        .btn-file.modern-file-input:hover, .btn-file.modern-file-input:hover * { color: var(--danger-hover) !important; }
-        .btn-file.modern-file-input.archivo-cargado, .btn-file.modern-file-input.archivo-cargado * { color: var(--success-hover) !important; }
+        .btn-upload-file i { font-size: 18px; }
+        .btn-upload-file:hover { background: var(--primary-soft) !important; border-color: var(--primary-hover) !important; color: var(--primary-hover) !important; }
+        .btn-upload-file.archivo-cargado { background: var(--success) !important; border-color: var(--success) !important; color: #fff !important; }
+        .btn-upload-file.archivo-cargado:hover { background: var(--success-hover) !important; border-color: var(--success-hover) !important; color: #fff !important; }
+        .nc-file-row { display: flex; align-items: center; gap: 8px; }
+        .nc-file-row .btn-upload-file { flex: 1 1 auto; margin-bottom: 0 !important; }
+        .nc-file-row .action-btn { flex: 0 0 32px; }
+        .d-none { display: none !important; }
 
         /* ===== Formulario de NC ===== */
         #FrmNoConformidad {
@@ -1273,18 +1383,29 @@ if ($_GET['Filtrar'] == 1) {
             .modal-footer .btn { flex: 1 1 auto; min-width: 0; padding: 10px 14px; font-size: 12px; justify-content: center; }
             .modal-dialog-scrollable .modal-body { max-height: calc(100vh - 140px); }
 
+            #ModalConsultaNoConformidad .modal-body { padding: 14px !important; }
+            .nc-detail { gap: 14px; }
+            .nc-detail-head { flex-direction: column; align-items: stretch; }
+            .nc-detail-pdf { align-self: flex-start; }
+            .nc-detail-number { font-size: 18px; }
+            .nc-detail-meta, .nc-detail-columns, .nc-followup-grid { grid-template-columns: 1fr; }
+            .nc-detail-field--wide, .nc-detail-field--full { grid-column: auto; }
+            .nc-detail-columns > .nc-detail-section:only-child { grid-column: auto; }
+            .nc-detail-desc { padding: 10px 12px; }
+            .nc-detail-section-title { font-size: 12px; }
+
             #FrmNoConformidad { gap: 10px; }
             #FrmNoConformidad > .col-sm-4 { flex: 1 1 100%; min-width: 100%; width: 100%; }
             #FrmNoConformidad textarea.form-control { min-height: 70px; }
             .nc-box { padding: 14px 12px; gap: 10px; }
 
-            .nc-section { padding: 12px 10px !important; }
+            .nc-section, .seguimiento-card { padding: 12px 10px !important; }
             .seguimiento-header { margin: 0 0 8px 0; padding: 0 0 6px 0; }
             .badge-seguimiento { font-size: 10px; padding: 2px 10px; }
             .btn-borrar-seguimiento { height: 42px; margin: 6px 0 0 0; }
             .btn-borrar-seguimiento .action-btn { width: 42px; height: 42px; }
 
-            .btn-file.modern-file-input { padding: 12px 14px !important; font-size: 12px; }
+            .btn-upload-file { padding: 12px 14px !important; font-size: 12px; }
             .myAlert-top { min-width: auto; width: 92%; font-size: 12px; padding: 12px 16px; top: 70px; }
             textarea.form-control { min-height: 70px; }
             .nc-field { padding: 10px 12px !important; }
@@ -1332,11 +1453,9 @@ if ($_GET['Filtrar'] == 1) {
                 allowClear: false
             });
 
-            // Inicializar Select2 en los selectores del modal de edición
-            $('#CodGestion, #Proceso, #Tipo, #DetectadaEn, #RequiereAC').select2({
-                language: 'es',
-                dropdownParent: $('#ModalEditarNoConformidad'),
-                width: '100%'
+            ConfigurarSelectoresNoConformidad('ModalEditarNoConformidad');
+            $('#ModalCrearNoConformidad').on('hidden.bs.modal', function () {
+                UbicarFormularioNoConformidad('ModalEditarNoConformidad');
             });
 
             // Inicializar Select2 en el modal de reportes
@@ -1365,38 +1484,100 @@ if ($_GET['Filtrar'] == 1) {
 
         function SoloDigitos(e) { e.value = e.value.replace(/[^0-9]/g, ''); }
 
-        function MostrarNombreArchivo(input) {
+        function ConfigurarSelectoresNoConformidad(idModal) {
+            var $selectores = $('#CodGestion, #Proceso, #Tipo, #DetectadaEn, #RequiereAC');
+            $selectores.each(function () {
+                if ($(this).hasClass('select2-hidden-accessible')) {
+                    $(this).select2('destroy');
+                }
+            });
+            $selectores.select2({
+                language: 'es',
+                dropdownParent: $('#' + idModal),
+                width: '100%'
+            });
+        }
+
+        function UbicarFormularioNoConformidad(idModal) {
+            var destino = idModal === 'ModalCrearNoConformidad' ? '#DivBodyCrearNoConformidad' : '#DivBodyNoConformidad';
+            $('#FrmNoConformidad').appendTo(destino);
+            ConfigurarSelectoresNoConformidad(idModal);
+        }
+
+        function ObtenerBotonesNoConformidad() {
+            return $('#ModalCrearNoConformidad').is(':visible') ? '#BotsCrearNoConformidad' : '#BotsEditarNoConformidad';
+        }
+
+        function restaurarBotonArchivo() {
+            var label = document.getElementById('LabelFileNoConformidad');
             var span = document.getElementById('SpanFileNoConformidad');
-            if (!span) return;
-            if (input.files && input.files.length > 0) {
-                var nombre = input.files[0].name;
-                if (nombre.length > 45) { nombre = nombre.substring(0, 42) + '...'; }
-                span.innerHTML = '<i class="bi bi-file-earmark-check"></i> ' + nombre;
-                var contenedor = document.getElementById('BtnFileNoConformidad');
-                if (contenedor) contenedor.classList.add('archivo-cargado');
+            var btn = document.getElementById('BtnEliminarArchivo');
+
+            if (btn.dataset.existente === '1') {
+                span.innerHTML = 'Reemplazar PDF existente';
+                label.classList.add('archivo-cargado');
+                btn.classList.remove('d-none');
             } else {
-                span.innerHTML = '<i class="bi bi-file-earmark-pdf"></i> Adjuntar archivo PDF (máx. 4MB)';
-                var contenedor2 = document.getElementById('BtnFileNoConformidad');
-                if (contenedor2) contenedor2.classList.remove('archivo-cargado');
+                span.innerHTML = 'Seleccionar archivo PDF';
+                label.classList.remove('archivo-cargado');
+                btn.classList.add('d-none');
             }
         }
 
-        function ResetearArchivoNC() {
-            var span = document.getElementById('SpanFileNoConformidad');
-            var input = document.getElementById('FileNoConformidad');
-            var btn = document.getElementById('BtnFileNoConformidad');
-            if (span) { span.innerHTML = '<i class="bi bi-file-earmark-pdf"></i> Adjuntar archivo PDF (máx. 4MB)'; }
-            if (btn) { btn.classList.remove('archivo-cargado'); }
-            if (input) { input.value = ''; input.dataset.yacargado = 0; }
+        function ValidarArchivo(input) {
+            var file = input.files[0];
+            if (!file) { restaurarBotonArchivo(); return; }
+
+            if (file.type !== "application/pdf") {
+                MostrarDatoObser("¡Error! Solo se admiten archivos en formato PDF");
+                input.value = ''; restaurarBotonArchivo(); return;
+            }
+            if (file.size > 4 * 1024 * 1024) {
+                MostrarDatoObser("¡Error! El archivo supera el tamaño máximo permitido (4MB)");
+                input.value = ''; restaurarBotonArchivo(); return;
+            }
+
+            var nombre = file.name;
+            if (nombre.length > 35) nombre = nombre.substring(0, 32) + '...';
+            document.getElementById('SpanFileNoConformidad').innerHTML = nombre;
+            document.getElementById('LabelFileNoConformidad').classList.add('archivo-cargado');
+            document.getElementById('BtnEliminarArchivo').classList.remove('d-none');
         }
 
-        function MarcarArchivoYaCargado() {
-            var span = document.getElementById('SpanFileNoConformidad');
+        function EliminarArchivoNoConformidad() {
             var input = document.getElementById('FileNoConformidad');
-            var btn = document.getElementById('BtnFileNoConformidad');
-            if (span) { span.innerHTML = '<i class="bi bi-file-earmark-check"></i> Archivo PDF ya cargado — seleccione uno nuevo para reemplazar'; }
-            if (btn) { btn.classList.add('archivo-cargado'); }
-            if (input) input.dataset.yacargado = 1;
+            var btn = document.getElementById('BtnEliminarArchivo');
+
+            if (input.files && input.files.length > 0) {
+                input.value = '';
+                restaurarBotonArchivo();
+                return;
+            }
+
+            if (btn.dataset.existente !== '1') { return; }
+
+            var numeroNC = document.getElementById('NumeroNC').value;
+            if (!numeroNC || numeroNC === 'Nuevo') { return; }
+            if (!confirm('¿Eliminar el PDF adjunto? Esta acción no se puede deshacer.')) { return; }
+
+            btn.disabled = true;
+            $.ajax({
+                type: 'POST', url: "<?php echo basename(__FILE__); ?>", 
+                data: { TipoModificar: '<?php echo md5('JorEliminarArchivo' . date('d')); ?>', NumeroNC: numeroNC }, 
+                dataType: 'json', cache: false
+            }).done(function (response) {
+                if (response.status === 'success') {
+                    btn.dataset.existente = '0';
+                    restaurarBotonArchivo();
+                    MostrarDatoObser('PDF eliminado correctamente.', true);
+                } else {
+                    MostrarDatoObser(response.message || 'No se pudo eliminar el PDF.');
+                }
+            }).fail(function () {
+                MostrarDatoObser('Error de conexión al eliminar el PDF.');
+            }).always(function () {
+                btn.disabled = false;
+            });
         }
 
         function MostrarDatoObser(msg, mTipo) {
@@ -1410,7 +1591,6 @@ if ($_GET['Filtrar'] == 1) {
             setTimeout(function () { $("#DatoObser").hide(); }, 3000);
         }
 
-        // Búsqueda limpia: permite buscar sin obligar a llenar filtros
         function ValidarFiltros() {
             document.FrmFiltrar.submit();
         }
@@ -1471,21 +1651,37 @@ if ($_GET['Filtrar'] == 1) {
         function MostrarDivConsultaNoConformidad(mNumeroNC) {
             $("#ModalConsultaNoConformidadBody").load(
                 "<?php echo basename(__FILE__); ?>?TipoModificar=<?php echo md5('AjaxMostrarNoConformidad' . date('d')); ?>&NumeroNC=" + mNumeroNC,
-                $("#ModalConsultaNoConformidad").modal('show')
+                function() {
+                    $("#ModalConsultaNoConformidad").modal('show');
+                }
             );
         }
 
         function MostrarDivEditarNoConformidad(mNumeroNC) {
+            var esNuevo = mNumeroNC == 'Nuevo';
+            var modalId = esNuevo ? 'ModalCrearNoConformidad' : 'ModalEditarNoConformidad';
+            UbicarFormularioNoConformidad(modalId);
             document.FrmNoConformidad.reset();
             document.getElementById('NumeroNC').value = mNumeroNC;
             $("#FrmNoConformidad").find("input:text,select,textarea").removeClass("alert-danger");
-            ResetearArchivoNC();
-            if (mNumeroNC == 'Nuevo') {
+            $('#BotsEditarNoConformidad, #BotsCrearNoConformidad').hide();
+            $(esNuevo ? '#BotsCrearNoConformidad' : '#BotsEditarNoConformidad').show();
+            
+            document.getElementById('FileNoConformidad').value = '';
+            document.getElementById('BtnEliminarArchivo').dataset.existente = '0';
+            restaurarBotonArchivo();
+
+            if (esNuevo) {
                 document.getElementById('Responsable').value = '<?php echo $_SESSION['NomUsuario']; ?>';
                 document.getElementById('FApertura').value = '<?php echo date('d/m/Y'); ?>';
+                $('#DivDetectadaEnOtra, #DivRequiereAC, #DivNumeroNCAccionCorrectiva').hide();
+                document.getElementById('Proceso').length = 1;
                 $('#CodGestion, #Proceso, #Tipo, #DetectadaEn, #RequiereAC').val('').trigger('change');
-                $("#ModalEditarNoConformidad").modal('show');
+                $("#ModalCrearNoConformidad").modal('show');
             } else {
+                $("#TituloModalNoConformidad").html('<i class="bi bi-pencil-square"></i> Editar No Conformidad #' + mNumeroNC);
+                $("#BtnAceptarNoConformidad").html('<i class="bi bi-save"></i> Guardar Cambios');
+
                 $.ajax({
                     type: "GET", url: '<?php echo basename(__FILE__); ?>',
                     data: { TipoModificar: '<?php echo md5('Ajax1JorA1NoConformidad' . date('d')); ?>', NumeroNC: mNumeroNC },
@@ -1514,7 +1710,10 @@ if ($_GET['Filtrar'] == 1) {
                     document.getElementById('Causas').value = data.Causas || '';
                     document.getElementById('Accion').value = data.Accion || '';
                     document.getElementById('FRevision').value = data.FRevision || '';
-                    if (data.YaCargado === 1) { MarcarArchivoYaCargado(); }
+
+                    document.getElementById('BtnEliminarArchivo').dataset.existente = (data.YaCargado === 1) ? '1' : '0';
+                    restaurarBotonArchivo();
+                    
                     $("#ModalEditarNoConformidad").modal('show');
                 });
             }
@@ -1522,9 +1721,10 @@ if ($_GET['Filtrar'] == 1) {
 
         function GrabarNoConformidad() {
             MostrarDatoObser('Procesando');
-            mNumeroNC = document.FrmNoConformidad.NumeroNC.value;
-            $("#BotsNoConformidad").hide();
-            mRetorno = true;
+            var mNumeroNC = document.FrmNoConformidad.NumeroNC.value;
+            var selectorBotones = ObtenerBotonesNoConformidad();
+            $(selectorBotones).hide();
+            var mRetorno = true;
             var $camposObligatorios = $("#Responsable, #Tipo, #CodGestion, #Proceso, #FApertura, #DetectadaEn, #Descripcion, #FRevision");
             $camposObligatorios.each(function () {
                 $(this).removeClass("alert-danger");
@@ -1534,17 +1734,12 @@ if ($_GET['Filtrar'] == 1) {
                 if (!$("#DetectadaEnOtra").val() || $("#DetectadaEnOtra").val().trim() === '') { mRetorno = false; $("#DetectadaEnOtra").addClass("alert-danger"); }
                 else { $("#DetectadaEnOtra").removeClass("alert-danger"); }
             } else { $("#DetectadaEnOtra").removeClass("alert-danger"); }
+            
             if ($("#Tipo").val() === 'Corrección' && $("#RequiereAC").val() === '-1') {
                 if (!$("#NumeroNCAccionCorrectiva").val() || $("#NumeroNCAccionCorrectiva").val().trim() === '') { mRetorno = false; $("#NumeroNCAccionCorrectiva").addClass("alert-danger"); }
                 else { $("#NumeroNCAccionCorrectiva").removeClass("alert-danger"); }
             }
-            if (mRetorno) {
-                var input = document.getElementById("FileNoConformidad");
-                if (input.files.length > 0) {
-                    if (!(input.files[0].type == "application/pdf")) { $("#BotsNoConformidad").show(); MostrarDatoObser("¡Error! Solo se admiten archivos en formato PDF"); return false; }
-                    if (input.files[0].size > 4 * 1024 * 1024) { $("#BotsNoConformidad").show(); MostrarDatoObser("¡Error! El archivo supera el tamaño máximo permitido (4MB)"); return false; }
-                }
-            }
+            
             if (mRetorno) {
                 document.FrmNoConformidad.TipoGrabar.value = 'GrabarNoConformidad';
                 document.FrmNoConformidad.TipoModificar.value = '<?php echo md5('JorGrabarNoConformidad' . date('d')); ?>';
@@ -1556,12 +1751,12 @@ if ($_GET['Filtrar'] == 1) {
                     if (response.status === 'success') {
                         MostrarDatoObser("Los datos se grabaron.", true);
                         $("#FiltroNumeroNC").val(response.id);
-                        setTimeout("document.FrmFiltrar.submit()", 500);
-                    } else { $("#BotsNoConformidad").show(); MostrarDatoObser(response.message || "No se pudo guardar el registro."); }
-                }).fail(function () { $("#BotsNoConformidad").show(); MostrarDatoObser("Error de conexión o formato inválido en el servidor."); });
+                        setTimeout(function() { document.FrmFiltrar.submit(); }, 500);
+                    } else { $(selectorBotones).show(); MostrarDatoObser(response.message || "No se pudo guardar el registro."); }
+                }).fail(function () { $(selectorBotones).show(); MostrarDatoObser("Error de conexión o formato inválido."); });
             } else {
-                $("#BotsNoConformidad").show();
-                MostrarDatoObser('<i class="bi bi-exclamation-triangle"></i> Complete los campos resaltados en rojo antes de continuar.');
+                $(selectorBotones).show();
+                MostrarDatoObser('<i class="bi bi-exclamation-triangle"></i> Complete los campos resaltados en rojo.');
                 ScrollAlPrimerError('#FrmNoConformidad');
             }
         }
@@ -1569,66 +1764,57 @@ if ($_GET['Filtrar'] == 1) {
         function MostrarDivSeguimientos(mNumeroNCSeguimientos) {
             document.FrmSeguimientos.reset();
             document.getElementById('NumeroNCSeguimientos').value = mNumeroNCSeguimientos;
-            $("#FrmSeguimientos").find("input:text,select,textarea").removeClass("alert-danger");
-            $("#DivSeguimientos").load(
-                "<?php echo basename(__FILE__); ?>?TipoModificar=<?php echo md5('AjaxSeguimientos' . date('d')); ?>&NumeroNC=" + mNumeroNCSeguimientos,
-                function () {
-                    $("#ModalSeguimientos").modal('show');
-                    $("#DivSeguimientos input[id^='Fecha']").datepicker({ dateFormat: 'dd-mm-yy', showOn: 'focus' });
-                }
-            );
+            $("#BotsSeguimientos").show(); $("#FrmSeguimientos").find("input:text,select,textarea").removeClass("alert-danger");
+            $("#DivSeguimientos").load("<?php echo basename(__FILE__); ?>?TipoModificar=<?php echo md5('AjaxSeguimientos' . date('d')); ?>&NumeroNC=" + mNumeroNCSeguimientos, function () {
+                $("#ModalSeguimientos").modal('show');
+                $("#DivSeguimientos input[id^='Fecha']").datepicker({ dateFormat: 'dd-mm-yy', showOn: 'focus' });
+            });
         }
 
         function BorrarSeguimiento(Obj) {
-            var mID = Obj.id.replace("BotBorrarSeguimiento", "");
-            document.getElementById('Borrada' + mID).value = 1;
-            $("#DivSeguimiento" + mID).hide();
+            var btn = Obj.closest('button') || Obj.parentElement;
+            var mID = btn.id.replace("BotBorrarSeguimiento", "");
+            document.getElementById('Borrada' + mID).value = 1; $("#DivSeguimiento" + mID).hide();
         }
 
         function AgregarSeguimiento() {
-            mRegNew = parseInt(document.getElementById('CantSeguimientos').value, 10);
-            if (isNaN(mRegNew)) { 
-                mRegNew = 1; 
-            } else { 
-                mRegNew++; 
-            }
+            var mRegNew = parseInt(document.getElementById('CantSeguimientos').value, 10);
+            if (isNaN(mRegNew)) { mRegNew = 1; } else { mRegNew++; }
             document.getElementById('CantSeguimientos').value = mRegNew;
 
             var $nuevoBloque = $('#DivSeguimiento1').clone();
-
             $nuevoBloque.find("input,select,a,button,textarea,div,span").each(function () {
                 $(this).attr({
                     'id': function (_, id) { return (id ? id.replace('1', mRegNew) : null); },
                     'name': function (_, name) { return (name ? name.replace('1', mRegNew) : null); },
                     'checked': false
                 });
-                if ($(this).is('input,select,textarea')) { 
-                    $(this).val(''); 
-                }
+                if ($(this).is('input,select,textarea')) { $(this).val(''); }
             });
 
-            var $inputFecha = $nuevoBloque.find("input[id^='Fecha']");
-            $inputFecha.removeClass('hasDatepicker').removeData('datepicker').unbind();
-
+            $nuevoBloque.find("input[id^='Fecha']").removeClass('hasDatepicker').removeData('datepicker').unbind();
+            
             $nuevoBloque.find('#SpanSeguimiento' + mRegNew).text('Seguimiento ' + mRegNew);
+            
             $nuevoBloque.attr("id", "DivSeguimiento" + mRegNew);
-            $nuevoBloque.show();
-
-            $nuevoBloque.appendTo('#DivSeguimientos');
-
-            $("#Fecha" + mRegNew).datepicker({ 
-            dateFormat: 'dd/mm/yy', 
-            showOn: 'focus' 
-            });
+            $nuevoBloque.show(); $nuevoBloque.appendTo('#DivSeguimientos');
+            $("#Fecha" + mRegNew).datepicker({ dateFormat: 'dd/mm/yy', showOn: 'focus' });
         }
+
+        $(document).on('mouseenter', '.btn-borrar-seguimiento', function() {
+            $(this).closest('.seguimiento-card').addClass('card-eliminar-hover');
+        }).on('mouseleave', '.btn-borrar-seguimiento', function() {
+            $(this).closest('.seguimiento-card').removeClass('card-eliminar-hover');
+        });
+
         function GrabarSeguimientos() {
             MostrarDatoObser('Procesando');
-            mNumeroNCSeguimientos = document.getElementById('NumeroNCSeguimientos').value;
+            var mNumeroNCSeguimientos = document.getElementById('NumeroNCSeguimientos').value;
             $("#BotsSeguimientos").hide();
-            mRetorno = true;
-            mCantSeguimientos = document.getElementById('CantSeguimientos').value;
-            var mAlMenosUno = false;
-            for (NumSeguimiento = 1; NumSeguimiento <= mCantSeguimientos; NumSeguimiento++) {
+            var mRetorno = true, mAlMenosUno = false;
+            var mCantSeguimientos = document.getElementById('CantSeguimientos').value;
+            
+            for (var NumSeguimiento = 1; NumSeguimiento <= mCantSeguimientos; NumSeguimiento++) {
                 if (document.getElementById('Borrada' + NumSeguimiento) && document.getElementById('Borrada' + NumSeguimiento).value != 1) {
                     mAlMenosUno = true;
                     $("#Accion" + NumSeguimiento + ", #Resultado" + NumSeguimiento + ", #Fecha" + NumSeguimiento + ", #RealizadoPor" + NumSeguimiento).each(function () {
@@ -1638,17 +1824,16 @@ if ($_GET['Filtrar'] == 1) {
                 }
             }
             if (!mAlMenosUno) { mRetorno = false; }
+
             if (mRetorno) {
                 document.FrmSeguimientos.TipoGrabar.value = 'Seguimientos';
                 document.FrmSeguimientos.TipoModificar.value = '<?php echo md5('JorSeguimientos' . date('d')); ?>';
                 var f = new FormData(document.getElementById('FrmSeguimientos'));
                 $.ajax({
-                    url: "<?php echo basename(__FILE__); ?>", type: 'post', cache: false, data: f,
-                    dataType: "json", processData: false, contentType: false
+                    url: "<?php echo basename(__FILE__); ?>", type: 'post', cache: false, data: f, dataType: "json", processData: false, contentType: false
                 }).done(function (response) {
                     if (response.status === 'success') {
-                        MostrarDatoObser("Los datos se grabaron.", true);
-                        setTimeout("location.reload()", 500);
+                        MostrarDatoObser("Los datos se grabaron.", true); setTimeout(function () { location.reload(); }, 500);
                     } else { $("#BotsSeguimientos").show(); MostrarDatoObser(response.message || "Error al guardar."); }
                 });
             } else {
@@ -1661,11 +1846,10 @@ if ($_GET['Filtrar'] == 1) {
         function MostrarDivCerrarNoConformidad(mNumeroNCCerrar) {
             document.FrmCerrarNoConformidad.reset();
             document.getElementById('NumeroNCCerrar').value = mNumeroNCCerrar;
-            $("#FrmCerrarNoConformidad").find("input:text,select,textarea").removeClass("alert-danger");
+            $("#BotsCerrarNoConformidad").show(); $("#FrmCerrarNoConformidad").find("input:text,select,textarea").removeClass("alert-danger");
             $.ajax({
                 type: "GET", url: '<?php echo basename(__FILE__); ?>',
-                data: { TipoModificar: '<?php echo md5('AjaxCerrarNoConformidad' . date('d')); ?>', NumeroNC: mNumeroNCCerrar },
-                cache: false
+                data: { TipoModificar: '<?php echo md5('AjaxCerrarNoConformidad' . date('d')); ?>', NumeroNC: mNumeroNCCerrar }, cache: false
             }).done(function (html) {
                 if (html == "Error") { MostrarDatoObser("Se presentó un error"); return false; }
                 else { eval(html); $("#ModalCerrarNoConformidad").modal('show'); }
@@ -1674,9 +1858,8 @@ if ($_GET['Filtrar'] == 1) {
 
         function GrabarCerrarNoConformidad() {
             MostrarDatoObser('Procesando');
-            mNumeroNCCerrar = document.getElementById('NumeroNCCerrar').value;
-            $("#BotsCerrarNoConformidad").hide();
-            mRetorno = true;
+            var mNumeroNCCerrar = document.getElementById('NumeroNCCerrar').value;
+            $("#BotsCerrarNoConformidad").hide(); var mRetorno = true;
             $("#ResultadoRevision, #MotivoCierre, #NuevaAccion, #FCierre, #RCierre").each(function () {
                 $(this).removeClass("alert-danger");
                 if (!$(this).val() || $(this).val().trim() === '') { mRetorno = false; $(this).addClass("alert-danger"); }
@@ -1686,34 +1869,30 @@ if ($_GET['Filtrar'] == 1) {
                 document.FrmCerrarNoConformidad.TipoModificar.value = '<?php echo md5('JorCerrarNoConformidad' . date('d')); ?>';
                 var f = new FormData(document.getElementById('FrmCerrarNoConformidad'));
                 $.ajax({
-                    url: "<?php echo basename(__FILE__); ?>", type: 'post', cache: false, data: f,
-                    dataType: "json", processData: false, contentType: false
+                    url: "<?php echo basename(__FILE__); ?>", type: 'post', cache: false, data: f, dataType: "json", processData: false, contentType: false
                 }).done(function (response) {
                     if (response.status === 'success') {
-                        MostrarDatoObser("Los datos se grabaron.", true);
-                        setTimeout("location.reload()", 500);
+                        MostrarDatoObser("Los datos se grabaron.", true); setTimeout(function () { location.reload(); }, 500);
                     } else { $("#BotsCerrarNoConformidad").show(); MostrarDatoObser(response.message || "Error al guardar."); }
                 });
             } else {
-                $("#BotsCerrarNoConformidad").show();
-                MostrarDatoObser('<i class="bi bi-exclamation-triangle"></i> Complete los campos resaltados en rojo antes de continuar.');
-                ScrollAlPrimerError('#FrmCerrarNoConformidad');
+                $("#BotsCerrarNoConformidad").show(); MostrarDatoObser('<i class="bi bi-exclamation-triangle"></i> Complete los campos resaltados en rojo.'); ScrollAlPrimerError('#FrmCerrarNoConformidad');
             }
         }
 
-        let ultimaPeticionProceso = 0;
-        let procesoPendiente = '';
+        var ultimaPeticionProceso = 0;
+        var procesoPendiente = '';
         function CambioGestionProceso(mProceso) {
             if (typeof mProceso === 'undefined') mProceso = '';
-            const sel = document.getElementById('Proceso');
-            const mCodGestion = document.getElementById('CodGestion').value;
+            var sel = document.getElementById('Proceso');
+            var mCodGestion = document.getElementById('CodGestion').value;
             if (mProceso) procesoPendiente = mProceso;
-            const seleccionado = procesoPendiente || sel.value;
-            const id = ++ultimaPeticionProceso;
+            var seleccionado = procesoPendiente || sel.value;
+            var id = ++ultimaPeticionProceso;
             sel.length = 1;
             if (!mCodGestion) { procesoPendiente = ''; $('#Proceso').val('').trigger('change'); return; }
             $.ajax({
-                type: "GET", url: '<?php echo basename(__FILE__); ?>', dataType: "json", cache: false,
+                type: "GET", url: "<?php echo basename(__FILE__); ?>", dataType: "json", cache: false,
                 data: { TipoModificar: '<?php echo md5('JorCambioGestionProceso' . date('d')); ?>', CodGestion: mCodGestion }
             }).done(function (r) {
                 if (id !== ultimaPeticionProceso) return;
@@ -1721,14 +1900,13 @@ if ($_GET['Filtrar'] == 1) {
                 sel.length = 1;
                 r.procesos.forEach(p => sel.add(new Option(p.nombre, p.codigo)));
                 if (seleccionado && Array.from(sel.options).some(o => o.value === seleccionado)) { sel.value = seleccionado; }
-                procesoPendiente = '';
-                $('#Proceso').trigger('change');
+                procesoPendiente = ''; $('#Proceso').trigger('change');
             });
         }
 
         function CambioTipo() {
-            mCodTipo = document.getElementById('Tipo').value;
-            mRequiereAC = document.getElementById('RequiereAC').value;
+            var mCodTipo = document.getElementById('Tipo').value;
+            var mRequiereAC = document.getElementById('RequiereAC').value;
             if (mCodTipo == 'Corrección') {
                 $("#DivRequiereAC").show();
                 if (mRequiereAC == '-1') { $("#DivNumeroNCAccionCorrectiva").show(); }
@@ -1739,36 +1917,26 @@ if ($_GET['Filtrar'] == 1) {
         function MostrarDivReportes() { $("#ModalReportes").modal('show'); }
 
         function EnviarReportes() {
-            mRetorno = true;
+            var mRetorno = true;
             $("#TipoReporte").removeClass("alert-danger");
             if (!$("#TipoReporte").val()) { mRetorno = false; $("#TipoReporte").addClass("alert-danger"); }
-            if (!mRetorno) {
-                MostrarDatoObser('<i class="bi bi-exclamation-triangle"></i> Seleccione el tipo de reporte antes de generar.');
-                ScrollAlPrimerError('#FrmReportes'); return;
-            }
+            if (!mRetorno) { MostrarDatoObser('<i class="bi bi-exclamation-triangle"></i> Seleccione el tipo de reporte.'); ScrollAlPrimerError('#FrmReportes'); return; }
+            
             MostrarDatoObser('Procesando');
-            var $btnGenerar = $("#BtnGenerarReporte");
-            $btnGenerar.prop('disabled', true);
+            var $btnGenerar = $("#BtnGenerarReporte"); $btnGenerar.prop('disabled', true);
             (async () => {
                 try {
-                    const url = "<?php echo basename(__FILE__); ?>?TipoModificar=EnviarReportes&TipoGrabar=<?php echo md5('JorEnviarReportes' . date('d')); ?>" +
-                                "&TipoReporte=" + encodeURIComponent($("#TipoReporte").val()) +
-                                "&ReportProceso=" + encodeURIComponent($("#ReportProceso").val() || '');
+                    var url = "<?php echo basename(__FILE__); ?>?TipoModificar=EnviarReportes&TipoGrabar=<?php echo md5('JorEnviarReportes' . date('d')); ?>" +
+                              "&TipoReporte=" + encodeURIComponent($("#TipoReporte").val()) +
+                              "&ReportProceso=" + encodeURIComponent($("#ReportProceso").val() || '');
                     const response = await fetch(url);
                     if (!response.ok) { throw new Error('Error HTTP ' + response.status); }
                     const raw_data = await response.json();
-                    if (!Array.isArray(raw_data)) {
-                        MostrarDatoObser('<i class="bi bi-exclamation-triangle"></i> ' + (raw_data.error || 'No se pudo generar el reporte.')); return;
-                    }
-                    if (raw_data.length < 2 || !raw_data[0] || !raw_data[0]['Campos']) {
-                        MostrarDatoObser('<i class="bi bi-exclamation-triangle"></i> No hay datos para el reporte con los filtros seleccionados.'); return;
-                    }
-                    mCampos = raw_data[0];
-                    raw_data.shift();
-                    const prez = raw_data;
-                    if (prez.length === 0) {
-                        MostrarDatoObser('<i class="bi bi-exclamation-triangle"></i> No hay datos para el reporte con los filtros seleccionados.'); return;
-                    }
+                    if (!Array.isArray(raw_data)) { MostrarDatoObser('<i class="bi bi-exclamation-triangle"></i> ' + (raw_data.error || 'No se pudo generar el reporte.')); return; }
+                    if (raw_data.length < 2 || !raw_data[0] || !raw_data[0]['Campos']) { MostrarDatoObser('<i class="bi bi-exclamation-triangle"></i> No hay datos para el reporte.'); return; }
+                    let mCampos = raw_data[0]; raw_data.shift();
+                    const prez = raw_data; var rows = [];
+                    if (prez.length === 0) { MostrarDatoObser('<i class="bi bi-exclamation-triangle"></i> No hay datos.'); return; }
                     eval(mCampos['Campos']);
                     const worksheet = XLSX.utils.json_to_sheet(rows);
                     eval(mCampos['Formato']);
@@ -1776,13 +1944,13 @@ if ($_GET['Filtrar'] == 1) {
                     XLSX.utils.book_append_sheet(workbook, worksheet, "Datos");
                     XLSX.writeFile(workbook, "datos.xlsx", { compression: true });
                     MostrarDatoObser('<i class="bi bi-check-circle"></i> Reporte generado correctamente.', true);
-                } catch (err) {
-                    MostrarDatoObser('<i class="bi bi-exclamation-triangle"></i> Error al generar el reporte: ' + err.message);
+                } catch (err) { MostrarDatoObser('<i class="bi bi-exclamation-triangle"></i> Error al generar reporte: ' + err.message);
                 } finally { $btnGenerar.prop('disabled', false); }
             })();
         }
 
         function formatColumn(worksheet, col, fmt) {
+            if (!worksheet['!ref']) return;
             const range = XLSX.utils.decode_range(worksheet['!ref']);
             for (let row = range.s.r + 1; row <= range.e.r; ++row) {
                 const ref = XLSX.utils.encode_cell({ c: col, r: row });
@@ -1799,16 +1967,10 @@ if ($_GET['Filtrar'] == 1) {
             if (confirm('¿Está seguro que desea reversar esta no conformidad? Esto borrará la fecha de cierre y permitirá editarla nuevamente.')) {
                 MostrarDatoObser('Procesando');
                 $.ajax({
-                    type: "POST", url: '<?php echo basename(__FILE__); ?>',
-                    data: {
-                        TipoModificar: '<?php echo md5('JorReversarNoConformidad' . date('d')); ?>',
-                        TipoGrabar: 'ReversarNoConformidad', NumeroNC: mNumeroNC
-                    },
-                    dataType: 'json', cache: false
+                    type: "POST", url: "<?php echo basename(__FILE__); ?>", data: { TipoModificar: '<?php echo md5('JorReversarNoConformidad' . date('d')); ?>', TipoGrabar: 'ReversarNoConformidad', NumeroNC: mNumeroNC }, dataType: 'json', cache: false
                 }).done(function (response) {
                     if (response.status === 'success') {
-                        MostrarDatoObser("No conformidad reversada exitosamente.", true);
-                        setTimeout("location.reload()", 1000);
+                        MostrarDatoObser("No conformidad reversada exitosamente.", true); setTimeout(function () { location.reload(); }, 1000);
                     } else { MostrarDatoObser("Error al reversar: " + (response.message || '')); }
                 });
             }
@@ -1945,6 +2107,7 @@ if ($_GET['Filtrar'] == 1) {
                             <TD data-label="Detectada en"><?php echo $Row['DetectadaEn']; ?></TD>
                             <TD data-label="Acciones">
                                 <div class="acciones-cell">
+                                    <a class="action-btn action-view" onClick="MostrarDivConsultaNoConformidad(<?php echo $Row['NumeroNC']; ?>);" title="Ver detalles del registro" aria-label="Ver detalles del registro"><i class="bi bi-eye"></i></a>
                                     <?php
                                     if ($Row['FCierre'] > 0) {
                                         echo '<span class="fecha-cierre">' . DarFecha($Row['FCierre']) . '</span>';
@@ -1958,9 +2121,9 @@ if ($_GET['Filtrar'] == 1) {
                                         <a class="action-btn action-edit" onClick="MostrarDivEditarNoConformidad(<?php echo $Row['NumeroNC']; ?>);" title="Editar"><i class="bi bi-pencil-square"></i></a>
                                         <a class="action-btn action-list" onClick="MostrarDivSeguimientos(<?php echo $Row['NumeroNC'] ?>);" title="Seguimientos"><i class="bi bi-list-check"></i></a>
                                         <?php
-                                        if (InList($_SESSION["Perfil"], "DIREC", "ADMIN", "DUEPR")) {
+                                        if ($PuedeCerrar) {
                                             ?>
-                                            <a class="action-btn action-success" onClick="MostrarDivCerrarNoConformidad(<?php echo $Row['NumeroNC'] ?>)" title="Cerrar registro"><i class="bi bi-check2-circle"></i></a>
+                                            <a class="action-btn action-success" onClick="MostrarDivCerrarNoConformidad(<?php echo $Row['NumeroNC'] ?>)" title="Cerrar seguimiento" aria-label="Cerrar seguimiento"><i class="bi bi-check2-circle"></i></a>
                                             <?php
                                         }
                                     }
@@ -2053,12 +2216,12 @@ if ($_GET['Filtrar'] == 1) {
     </div>
 </div>
 
-<!-- MODAL EDITAR/CREAR -->
+<!-- MODAL EDITAR -->
 <div class="modal fade" id="ModalEditarNoConformidad" tabindex="-1" role="dialog" aria-hidden="true">
     <div class="modal-dialog modal-dialog-scrollable" role="document" style="width:98%">
         <div class="modal-content">
             <div class="modal-header">
-                <h3 class="modal-title col-sm-11" id="ModalEditarNoConformidadTitle"><i class="bi bi-pencil-square"></i> Editar / Crear No Conformidad</h3>
+                <h5 class="modal-title" id="TituloModalNoConformidad"><i class="bi bi-pencil-square"></i> Editar No Conformidad</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
             </div>
             <div class="modal-body row" id="DivBodyNoConformidad">
@@ -2172,24 +2335,43 @@ if ($_GET['Filtrar'] == 1) {
                                 <input type="text" name="FRevision" id="FRevision" class="form-control" placeholder="dd/mm/aaaa" onChange="ValidarFecha(this)" onBlur="ValidarFecha(this)">
                             </div>
                             <div class="form-group">
-                                <label class="btn btn-default btn-file modern-file-input"
-                                       id="BtnFileNoConformidad"
-                                       for="FileNoConformidad"
-                                       style="display:flex!important;cursor:pointer;margin-bottom:0;">
-                                    <span id="SpanFileNoConformidad"><i class="bi bi-file-earmark-pdf"></i> Adjuntar archivo PDF (máx. 4MB)</span>
-                                </label>
-                                <input name="FileNoConformidad" id="FileNoConformidad" type="file"
-                                       accept="application/pdf"
-                                       onChange="MostrarNombreArchivo(this)"
-                                       style="display:none;">
+                                <label>Documento Adjunto</label>
+                                <div class="nc-file-row">
+                                    <label for="FileNoConformidad" class="btn btn-upload-file flex-grow-1 d-flex align-items-center justify-content-center gap-2 py-2 mb-0" id="LabelFileNoConformidad">
+                                        <i class="bi bi-file-earmark-pdf-fill fs-5"></i>
+                                        <span id="SpanFileNoConformidad">Seleccionar archivo PDF</span>
+                                    </label>
+                                    <button type="button" class="action-btn action-danger flex-shrink-0 d-none" id="BtnEliminarArchivo" data-existente="0" onClick="EliminarArchivoNoConformidad();" title="Eliminar PDF adjunto">
+                                        <i class="bi bi-trash3"></i>
+                                    </button>
+                                </div>
+                                <input type="file" id="FileNoConformidad" name="FileNoConformidad" class="d-none" accept="application/pdf" onChange="ValidarArchivo(this)">
+                                <small class="text-muted d-block mt-1" style="font-size: 11px;">Máximo 4MB. Si ya hay uno cargado, se reemplazará.</small>
                             </div>
                         </div>
                     </div>
                 </form>
             </div>
-            <div class="modal-footer" id="BotsNoConformidad">
+            <div class="modal-footer" id="BotsEditarNoConformidad">
                 <button type="button" class="btn btn-danger" data-dismiss="modal"><i class="bi bi-x-lg"></i> Cerrar</button>
-                <button type="button" class="btn btn-success" onClick="GrabarNoConformidad();"><i class="bi bi-check2"></i> Aceptar</button>
+                <button type="button" class="btn btn-success" id="BtnAceptarNoConformidad" onClick="GrabarNoConformidad();"><i class="bi bi-check2"></i> Guardar Cambios</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL CREAR -->
+<div class="modal fade" id="ModalCrearNoConformidad" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-scrollable" role="document" style="width:98%">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="bi bi-plus-circle"></i> Crear No Conformidad</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            </div>
+            <div class="modal-body row" id="DivBodyCrearNoConformidad"></div>
+            <div class="modal-footer" id="BotsCrearNoConformidad">
+                <button type="button" class="btn btn-danger" data-dismiss="modal"><i class="bi bi-x-lg"></i> Cerrar</button>
+                <button type="button" class="btn btn-success" id="BtnCrearNoConformidad" onClick="GrabarNoConformidad();"><i class="bi bi-check2"></i> Crear Registro</button>
             </div>
         </div>
     </div>
@@ -2200,7 +2382,7 @@ if ($_GET['Filtrar'] == 1) {
     <div class="modal-dialog modal-dialog-scrollable" role="document" style="width:98%">
         <div class="modal-content">
             <div class="modal-header">
-                <h4 class="modal-title col-sm-11" id="ModalSeguimientosTitle"><i class="bi bi-list-check"></i> Editar Seguimientos No Conformidad</h4>
+                <h5 class="modal-title" id="ModalSeguimientosTitle"><i class="bi bi-list-check"></i> Seguimientos de No Conformidad</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
             </div>
             <div class="modal-body row" id="DivBodySeguimientos">
@@ -2226,7 +2408,7 @@ if ($_GET['Filtrar'] == 1) {
     <div class="modal-dialog modal-dialog-scrollable" role="document" style="width:98%">
         <div class="modal-content">
             <div class="modal-header">
-                <h3 class="modal-title col-sm-11" id="ModalCerrarNoConformidadTitle"><i class="bi bi-check2-circle"></i> Datos del Cierre del Registro</h3>
+                <h5 class="modal-title" id="ModalCerrarNoConformidadTitle"><i class="bi bi-check2-circle"></i> Cierre del Registro de No Conformidad</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
             </div>
             <div class="modal-body row" id="DivBodyCerrarNoConformidad">
