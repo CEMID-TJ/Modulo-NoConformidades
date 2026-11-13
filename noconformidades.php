@@ -728,11 +728,10 @@ $QueriGes  = "SELECT * FROM calidad.gestiones ORDER BY NomGestion";
 $ResultGes = $mysqli->query($QueriGes);
 
 // Listado de No Conformidades (consumido por la vista a través de $Result)
-if (!isset($_GET['Filtrar']) || (int)$_GET['Filtrar'] !== 1) {
-    $_GET['Filtrar'] = 1;
-}
+// Solo se consulta cuando el usuario envía una búsqueda (Filtrar=1).
+$Buscar = (isset($_GET['Filtrar']) && (int)$_GET['Filtrar'] === 1);
 
-if ($_GET['Filtrar'] == 1) {
+if ($Buscar) {
 
     if ($PuedeAdministrar) {
         $Filtrico = "WHERE NC.NumeroNC";      // Todas, hasta las Borradas
@@ -906,6 +905,8 @@ if ($_GET['Filtrar'] == 1) {
             box-shadow: inset 0 1px 2px rgba(11, 19, 34, .04);
             height: 40px; width: fit-content;
         }
+        /* Centra la botonera de acciones dentro de su columna del navbar */
+        .navbar form > .col-sm-2 { display: flex; align-items: center; justify-content: center; }
         .btn-nav {
             width: 32px; height: 32px; padding: 0 !important;
             border-radius: 6px !important; display: inline-flex !important;
@@ -1281,6 +1282,22 @@ if ($_GET['Filtrar'] == 1) {
         .sin-resultados i { font-size: 38px; color: var(--border-strong); display: block; margin-bottom: 10px; }
         .sin-resultados b { display: block; color: var(--text); font-size: 15px; margin-bottom: 4px; }
 
+        /* ===== Estado vacío: datos ocultos hasta buscar ===== */
+        .nc-empty-state {
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            text-align: center; gap: 8px;
+            min-height: calc(100vh - var(--navbar-height, 112px) - 210px);
+            padding: 40px 24px; margin: 0 0 15px;
+            background: #fff; border: 1.5px solid var(--border); border-radius: 14px;
+            box-shadow: var(--shadow);
+        }
+        .nc-empty-state .nc-empty-icon { font-size: 56px; color: var(--primary); opacity: .85; }
+        .nc-empty-state h6 { font-size: 17px; font-weight: 800; margin: 4px 0 0; color: var(--text); }
+        .nc-empty-state p { max-width: 520px; margin: 0; color: var(--text-muted); font-size: 13.5px; }
+        .nc-empty-state ul { list-style: none; padding: 0; margin: 8px 0 0; display: grid; gap: 6px; text-align: left; }
+        .nc-empty-state li { font-size: 12.5px; color: var(--text-muted); }
+        .nc-empty-state li i { color: var(--primary); margin-right: 6px; }
+
         /* ===== Paginación ===== */
         .nc-pagination {
             display: flex; align-items: center; justify-content: space-between;
@@ -1302,10 +1319,10 @@ if ($_GET['Filtrar'] == 1) {
         .page-btn.disabled { opacity: .45; pointer-events: none; }
         .page-ellipsis { padding: 0 4px; color: var(--text-muted); }
 
-        /* ===== Descripción modal móvil ===== */
+        /* ===== Pista de navegación móvil ===== */
         .desc-hint { display: none; }
 
-        /* ===== RESPONSIVE ===== */
+        /* ===== RESPONSIVE: tablet (hasta 991 px) ===== */
         @media (max-width: 991px) {
             .container { width: 100%; padding: 0 12px; }
             .btn-nav { width: 34px; height: 34px; }
@@ -1318,6 +1335,8 @@ if ($_GET['Filtrar'] == 1) {
                 box-shadow: 0 0 0 2px rgba(37, 99, 235, .22), var(--shadow-sm) !important;
             }
         }
+
+        /* ===== RESPONSIVE: móvil (hasta 767 px) ===== */
         @media (max-width: 767px) {
             body { font-size: 13px; }
             .container { width: 100%; padding: 0 8px; }
@@ -1359,6 +1378,11 @@ if ($_GET['Filtrar'] == 1) {
             }
             .tableFixHead tbody td.sin-resultados { text-align: center !important; padding: 24px 8px !important; background: #fff; border: 1.5px solid var(--border); border-radius: 10px; }
             .tableFixHead tbody td.sin-resultados::before { content: none; }
+
+            .nc-empty-state { min-height: calc(100vh - var(--navbar-height, 112px) - 220px); padding: 28px 16px; }
+            .nc-empty-state .nc-empty-icon { font-size: 44px; }
+            .nc-empty-state h6 { font-size: 15px; }
+            .nc-empty-state p { font-size: 12.5px; }
             .tableFixHead tbody tr td:last-child { border-top: 1px dashed var(--border) !important; padding-top: 10px !important; margin-top: 6px; }
 
             .tableFixHead tbody td.desc-cell { cursor: pointer; }
@@ -1381,10 +1405,12 @@ if ($_GET['Filtrar'] == 1) {
             .nc-pagination-controls { justify-content: center; }
             .page-btn { min-width: 36px; height: 36px; }
 
-            .acciones-cell { justify-content: flex-start; gap: 6px; flex-wrap: wrap; }
+            .acciones-cell { justify-content: center; gap: 6px; flex-wrap: wrap; }
+            .tableFixHead tbody td[data-label="Acciones"] { text-align: center !important; }
+            .tableFixHead tbody td[data-label="Acciones"]::before { content: none; display: none; }
             .action-btn { width: 40px; height: 40px; font-size: 16px; }
             .action-btn i { font-size: 16px; }
-            .fecha-cierre { display: inline-flex; align-items: center; height: 40px; margin-right: 4px; }
+            .fecha-cierre { display: inline-flex; align-items: center; height: 40px; margin-right: 0; }
 
             .modal-dialog { margin: 8px auto !important; width: calc(100% - 16px) !important; max-width: none !important; }
             .modal-content { border-radius: 10px !important; }
@@ -1425,6 +1451,8 @@ if ($_GET['Filtrar'] == 1) {
             .nc-value { font-size: 13px; }
             .d-none-mobile { display: none !important; }
         }
+
+        /* ===== RESPONSIVE: móvil compacto (hasta 480 px) ===== */
         @media (max-width: 480px) {
             .navbar .collapse form > .col-sm-10 > .form-group { width: 100%; float: none; }
             .modal-footer { flex-direction: column; }
@@ -1433,6 +1461,8 @@ if ($_GET['Filtrar'] == 1) {
             .actions-box { flex-wrap: wrap; }
             .btn-nav { flex: 1 1 0; min-width: 40px; }
         }
+
+        /* ===== RESPONSIVE: ajuste del detalle en tablet ===== */
         @media (min-width: 768px) and (max-width: 991px) {
             #ModalConsultaNoConformidad .modal-body { padding: 18px !important; }
             .nc-detail-head { flex-direction: row; align-items: flex-start; }
@@ -1441,6 +1471,46 @@ if ($_GET['Filtrar'] == 1) {
             .nc-detail-field--wide, .nc-detail-field--full { grid-column: 1 / -1; }
             .nc-detail-columns > .nc-detail-section:only-child { grid-column: 1 / -1; }
         }
+
+        /* ===== RESPONSIVE: pantallas anchas (1600 px en adelante) ===== */
+        @media (min-width: 1600px) {
+            /* 1. El contenido deja de estar clavado en 1600 px */
+            .container { max-width: 2400px; }
+
+            /* 2. La navbar fija se alinea con el contenido (mismos márgenes) */
+            .navbar-default {
+                padding-left: calc((100vw - min(96vw, 2400px)) / 2 + 16px);
+                padding-right: calc((100vw - min(96vw, 2400px)) / 2 + 16px);
+            }
+
+            /* 3. Cada modal con un ancho cómodo, no gigante */
+            .modal-dialog { max-width: 1900px; }
+            #ModalEditarNoConformidad .modal-dialog,
+            #ModalCrearNoConformidad .modal-dialog { max-width: 1700px; }
+            #ModalSeguimientos .modal-dialog { max-width: 1500px; }
+            #ModalCerrarNoConformidad .modal-dialog { max-width: 1400px; }
+
+            /* 4. El detalle de la consulta aprovecha el modal */
+            .nc-detail { max-width: 1700px; }
+
+            /* 5. Un poco más de aire en la tabla */
+            .table > tbody > tr > td,
+            .table > thead > tr > th { padding: 14px 20px !important; }
+        }
+
+        /* ===== RESPONSIVE: pantallas muy anchas (2200 px en adelante) ===== */
+        @media (min-width: 2200px) {
+            .container { max-width: 2600px; }
+            .navbar-default {
+                padding-left: calc((100vw - min(96vw, 2600px)) / 2 + 16px);
+                padding-right: calc((100vw - min(96vw, 2600px)) / 2 + 16px);
+            }
+            body { font-size: 15px; }
+            .nc-detail { max-width: 2000px; }
+            .nc-detail-value, .nc-detail-text { font-size: 14px; }
+        }
+
+        /* Evita que el encabezado de la tabla se superponga a los modales. */
         body.modal-open .tableFixHead thead th { position: static !important; top: auto !important; }
     </style>
 
@@ -1624,9 +1694,11 @@ if ($_GET['Filtrar'] == 1) {
             }
         }
 
+        /* ===== Interacciones responsive ===== */
         function EsVistaMovil() { return window.matchMedia && window.matchMedia('(max-width: 767px)').matches; }
         function EsVistaResponsive() { return window.matchMedia && window.matchMedia('(max-width: 991px)').matches; }
 
+        // Muestra la indicación solo cuando el texto de descripción queda truncado.
         function AjustarHintsDescripcion() {
             if (!EsVistaMovil()) { return; }
             $('.desc-cell').each(function () {
@@ -1638,6 +1710,7 @@ if ($_GET['Filtrar'] == 1) {
         }
         $(window).on('load resize', function () { AjustarHintsDescripcion(); });
 
+        // Mantiene visible qué tarjeta está seleccionada durante la interacción táctil.
         $(document).on('touchstart mousedown', '#TBodyNoConformidad tr[data-id]', function () {
             if (!EsVistaResponsive()) { return; }
             var $tr = $(this);
@@ -1645,6 +1718,7 @@ if ($_GET['Filtrar'] == 1) {
             $tr.addClass('fila-seleccionada');
         });
 
+        // En tablet y móvil, tocar una fila abre su consulta completa, excepto en controles interactivos.
         $(document).on('click', '#TBodyNoConformidad tr[data-id]', function (e) {
             if (!EsVistaResponsive()) { return; }
             var $tr = $(this);
@@ -2093,6 +2167,7 @@ if ($_GET['Filtrar'] == 1) {
     <!-- TABLA + PAGINACIÓN -->
     <div class="row sidenav">
 
+        <?php if ($Buscar) { ?>
         <div class="tableFixHead table-responsive">
             <table class="table table-striped table-bordered small">
                 <thead>
@@ -2186,6 +2261,18 @@ if ($_GET['Filtrar'] == 1) {
                 ?>
                 <a class="page-btn <?php echo ($paginaActual >= $totalPaginas ? 'disabled' : ''); ?>" href="<?php echo ($paginaActual < $totalPaginas ? htmlspecialchars($UrlPagina($paginaActual + 1)) : '#'); ?>">Siguiente &raquo;</a>
             </div>
+        </div>
+        <?php } ?>
+        <?php } else { ?>
+        <div class="nc-empty-state">
+            <i class="bi bi-search nc-empty-icon"></i>
+            <h6>Consulta de No Conformidades</h6>
+            <p>Los registros están ocultos. Use los filtros de la barra superior y presione el botón <b>Buscar</b> para consultarlos. Si no selecciona ningún filtro, se mostrarán todos los registros.</p>
+            <ul>
+                <li><i class="bi bi-hash"></i> <b>N° reg:</b> abre un registro por su número.</li>
+                <li><i class="bi bi-funnel"></i> <b>Gestión / Proceso / Tipo:</b> filtran el listado.</li>
+                <li><i class="bi bi-search"></i> <b>Buscar:</b> lupa de la barra superior.</li>
+            </ul>
         </div>
         <?php } ?>
     </div>
