@@ -1236,7 +1236,7 @@ if ($Buscar) {
             width: 100%; font-weight: 600; font-size: 13px; transition: all .2s ease;
             text-decoration: none !important; text-align: center !important; cursor: pointer;
         }
-        .btn-upload-file i { font-size: 18px; }
+        .btn-upload-file i { font-size: 18px; color: inherit !important; }
         .btn-upload-file:hover { background: var(--primary-soft) !important; border-color: var(--primary-hover) !important; color: var(--primary-hover) !important; }
         .btn-upload-file.archivo-cargado { background: var(--success) !important; border-color: var(--success) !important; color: #fff !important; }
         .btn-upload-file.archivo-cargado:hover { background: var(--success-hover) !important; border-color: var(--success-hover) !important; color: #fff !important; }
@@ -2202,7 +2202,7 @@ if ($Buscar) {
                                         echo '<span class="fecha-cierre">' . DarFecha($Row['FCierre']) . '</span>';
                                         if ($PuedeReversar) {
                                             ?>
-                                            <a class="action-btn action-danger" onClick="ReversarNoConformidad({{ $Row['NumeroNC'] }})" title="Reversar no conformidad"><i class="bi bi-arrow-counterclockwise"></i></a>
+                                            <a class="action-btn action-danger" onClick="ReversarNoConformidad(<?php echo $Row['NumeroNC']; ?>)" title="Reversar no conformidad"><i class="bi bi-arrow-counterclockwise"></i></a>
                                             <?php
                                         }
                                     } else {
