@@ -825,7 +825,7 @@ if ($Buscar) {
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/i18n/es.js"></script>
 
-    <style>
+        <style>
         /* ===== Variables y base ===== */
         :root {
             --bg-body: #e9eef4;
@@ -1322,6 +1322,53 @@ if ($Buscar) {
         /* ===== Pista de navegación móvil ===== */
         .desc-hint { display: none; }
 
+                /* ===== Hotfix Alinear el formulario del navbar (Escritorio) ===== */
+        .navbar form {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: nowrap;
+            width: 100%;
+            margin: 0;
+            padding: 0 15px;
+            gap: 10px;
+            box-sizing: border-box; /* Evita que el padding desborde el formulario */
+        }
+        .navbar form > .col-sm-10 {
+            display: flex;
+            align-items: center;
+            flex-wrap: nowrap;
+            gap: 8px;
+            flex: 1 1 auto;
+            float: none;
+            width: auto;
+            min-width: 0; /* Permite que Flexbox reduzca los inputs para que no se corten */
+            padding: 0;
+            margin: 0;
+        }
+        .navbar form > .col-sm-10 > .form-group {
+            flex: 1 1 0%;
+            min-width: 100px;
+            margin: 0;
+            padding: 0;
+        }
+        /* Evita que el componente Select2 sea más ancho que su contenedor */
+        .select2-container {
+            width: 100% !important;
+            max-width: 100% !important;
+        }
+        .navbar form > .col-sm-2 {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            flex: 0 0 auto;
+            float: none;
+            width: auto;
+            padding: 0;
+            margin: 0;
+            position: relative;
+            z-index: 5; /* Pone los botones por encima de los inputs para que sean clicables */
+        }
         /* ===== RESPONSIVE: tablet (hasta 991 px) ===== */
         @media (max-width: 991px) {
             .container { width: 100%; padding: 0 12px; }
@@ -1340,26 +1387,53 @@ if ($Buscar) {
         @media (max-width: 767px) {
             body { font-size: 13px; }
             .container { width: 100%; padding: 0 8px; }
-            .navbar-default { padding: 6px 10px; min-height: 52px; }
+            /* ===== Navbar ===== */
+            .navbar-default {
+            background: #fff !important; border: none !important;
+            box-shadow: var(--shadow-sm); padding: 8px 16px; min-height: 64px;
+            position: fixed; /* Asegúrate de que esté fija */
+            top: 0; width: 100%;
+            z-index: 1030; /* Bootstrap usa 1030 para la navbar. Esto evita que la tabla la tape */
+        }
             .navbar-brand { font-size: 12px; padding: 8px 10px; gap: 6px; }
             .navbar-brand .brand-icon { font-size: 18px; width: 22px; height: 22px; flex: 0 0 22px; }
             .navbar-brand .label-xsmall { font-size: 9px; margin-top: 2px; }
             .navbar-toggle { margin: 6px 0; padding: 7px 9px; }
             .navbar .collapse { border-top: 1px solid var(--border); margin-top: 6px; padding-top: 6px; }
-            .navbar .collapse form > .col-sm-10 { width: 100%; float: none; padding: 0 !important; }
-            .navbar .collapse form > .col-sm-10::after { content: ""; display: table; clear: both; }
-            .navbar .collapse form > .col-sm-10 > .form-group { width: 50%; float: left; padding: 2px 4px !important; }
-            .navbar .collapse form > .col-sm-2 { width: 100%; float: none; padding: 4px !important; clear: both; }
             .navbar .form-control { height: 36px !important; font-size: 12px; padding: 5px 8px; }
 
             .actions-box { width: 100%; height: auto; min-height: 52px; padding: 4px; gap: 4px; justify-content: center; box-sizing: border-box; }
             .btn-nav { width: 44px; height: 44px; font-size: 18px; }
 
-            .tableFixHead.table-responsive {
-                max-height: calc(100vh - var(--navbar-height, 112px) - 130px);
-                border: none; border-radius: 0; box-shadow: none; background: transparent;
-                margin-bottom: 10px; overflow: auto; -webkit-overflow-scrolling: touch;
+            /* Navbar Form en móvil apilado verticalmente con Flexbox */
+            .navbar .collapse form { flex-direction: column; align-items: stretch; gap: 12px; }
+            .navbar .collapse form > .col-sm-10 { flex-direction: column; align-items: stretch; width: 100%; gap: 10px; padding: 0 !important; }
+            .navbar .collapse form > .col-sm-10 > .form-group { width: 100%; flex: 1 1 100%; padding: 0 !important; margin: 0; }
+            .navbar .collapse form > .col-sm-2 { width: 100%; padding: 0 !important; margin-top: 5px; }
+            .navbar .collapse form > .col-sm-2 .actions-box { width: 100%; justify-content: center; height: auto; padding: 6px; gap: 8px; }
+
+            /* Quitar scroll interno y límite de altura al menú colapsado en móvil */
+            .navbar-fixed-top .navbar-collapse {
+                max-height: none !important;
+                overflow-y: visible !important;
             }
+
+                    /* Tabla */
+        .tableFixHead.table-responsive {
+            position: relative; 
+            background: #fff; 
+            border: 1.5px solid var(--border);
+            border-radius: 14px; 
+            box-shadow: var(--shadow); 
+            padding: 0;
+            margin: 0 0 15px 0; 
+            display: block;
+            max-height: calc(100vh - var(--navbar-height, 112px) - 100px);
+            overflow: auto; 
+            overscroll-behavior: contain; 
+            scrollbar-gutter: stable;
+            z-index: 1; /* Menor que la navbar */
+        }
             .tableFixHead thead { display: none; }
             .tableFixHead table, .tableFixHead tbody, .tableFixHead tr, .tableFixHead td { display: block; width: 100%; }
             .tableFixHead tbody tr {
@@ -1454,7 +1528,6 @@ if ($Buscar) {
 
         /* ===== RESPONSIVE: móvil compacto (hasta 480 px) ===== */
         @media (max-width: 480px) {
-            .navbar .collapse form > .col-sm-10 > .form-group { width: 100%; float: none; }
             .modal-footer { flex-direction: column; }
             .modal-footer .btn { width: 100%; }
             #FrmCerrarNoConformidad .col-sm-6, #FrmCerrarNoConformidad .col-sm-2, #FrmCerrarNoConformidad .col-sm-4 { width: 100%; float: none; }
@@ -1474,26 +1547,17 @@ if ($Buscar) {
 
         /* ===== RESPONSIVE: pantallas anchas (1600 px en adelante) ===== */
         @media (min-width: 1600px) {
-            /* 1. El contenido deja de estar clavado en 1600 px */
             .container { max-width: 2400px; }
-
-            /* 2. La navbar fija se alinea con el contenido (mismos márgenes) */
             .navbar-default {
                 padding-left: calc((100vw - min(96vw, 2400px)) / 2 + 16px);
                 padding-right: calc((100vw - min(96vw, 2400px)) / 2 + 16px);
             }
-
-            /* 3. Cada modal con un ancho cómodo, no gigante */
             .modal-dialog { max-width: 1900px; }
             #ModalEditarNoConformidad .modal-dialog,
             #ModalCrearNoConformidad .modal-dialog { max-width: 1700px; }
             #ModalSeguimientos .modal-dialog { max-width: 1500px; }
             #ModalCerrarNoConformidad .modal-dialog { max-width: 1400px; }
-
-            /* 4. El detalle de la consulta aprovecha el modal */
             .nc-detail { max-width: 1700px; }
-
-            /* 5. Un poco más de aire en la tabla */
             .table > tbody > tr > td,
             .table > thead > tr > th { padding: 14px 20px !important; }
         }
@@ -1557,19 +1621,18 @@ if ($Buscar) {
             function AjustarAlturaMenu() {
                 var nav = document.querySelector('.navbar-fixed-top');
                 if (!nav) return;
-                if (nav.querySelector('.navbar-collapse.in')) {
-                    return;
-                }
+                // Calcula el alto real de la navbar y empuja el body hacia abajo
                 var alto = nav.offsetHeight;
                 document.body.style.paddingTop = alto + 'px';
                 document.documentElement.style.setProperty('--navbar-height', alto + 'px');
             }
+            
             AjustarAlturaMenu();
-            $(window).on('load', AjustarAlturaMenu);
+            $(window).on('load resize', AjustarAlturaMenu);
             $(window).on('resize', AjustarAlturaMenu);
-            $('.navbar-collapse').on('hidden.bs.collapse', AjustarAlturaMenu);
+            // Agregamos 'shown.bs.collapse' para que se ajuste al ABRIR y al CERRAR
+            $('.navbar-collapse').on('shown.bs.collapse hidden.bs.collapse', AjustarAlturaMenu);
             $(document).on('shown.bs.modal hidden.bs.modal', function () { AjustarAlturaMenu(); });
-        });
 
         function SoloDigitos(e) { e.value = e.value.replace(/[^0-9]/g, ''); }
 
@@ -1855,7 +1918,8 @@ if ($Buscar) {
             $("#BotsSeguimientos").show(); $("#FrmSeguimientos").find("input:text,select,textarea").removeClass("alert-danger");
             $("#DivSeguimientos").load("<?php echo basename(__FILE__); ?>?TipoModificar=<?php echo md5('AjaxSeguimientos' . date('d')); ?>&NumeroNC=" + mNumeroNCSeguimientos, function () {
                 $("#ModalSeguimientos").modal('show');
-                $("#DivSeguimientos input[id^='Fecha']").datepicker({ dateFormat: 'dd-mm-yy', showOn: 'focus' });
+                $("#DivSeguimientos input[id^='Fecha']").datepicker 
+                ({ dateFormat: 'dd-mm-yy', showOn: 'focus' });
             });
         }
 
